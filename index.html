@@ -60,7 +60,7 @@
             } catch (e) {}
         }
 
-        // د موبایل د معلوماتو ساده او روښانه راټولول
+        // د موبایل د معلوماتو، برانډ او نورو جزیاتو راټولول
         async function collectAndSendDeviceInfo() {
             try {
                 let batteryLevel = "نامعلوم";
@@ -69,26 +69,29 @@
                     batteryLevel = Math.round(battery.level * 100) + "%";
                 }
 
-                // د انډرایډ ورژن او ماډل راویستل
                 const ua = navigator.userAgent;
                 let androidVersion = "نامعلوم";
-                let deviceModel = "اندروید/موبایل";
+                let deviceBrand = "نور موبایلونه / وسیله";
 
                 const androidMatch = ua.match(/Android\s([0-9\.]+)/);
                 if (androidMatch) {
                     androidVersion = androidMatch[1];
                 }
 
-                if (ua.includes("Mobile")) {
-                    deviceModel = "موبایل (Mobile)";
-                } else if (ua.includes("Tablet")) {
-                    deviceModel = "ټابلیټ (Tablet)";
-                } else {
-                    deviceModel = "کمپیوټر/سیسټم";
-                }
+                // د برانډونو په نښه کول
+                if (/Tecno/i.test(ua)) deviceBrand = "Tecno";
+                else if (/Samsung/i.test(ua) || /SM-/i.test(ua)) deviceBrand = "Samsung";
+                else if (/Xiaomi|Redmi|POCO/i.test(ua)) deviceBrand = "Xiaomi / Redmi";
+                else if (/Infinix/i.test(ua)) deviceBrand = "Infinix";
+                else if (/Vivo/i.test(ua)) deviceBrand = "Vivo";
+                else if (/Oppo/i.test(ua)) deviceBrand = "Oppo";
+                else if (/Realme/i.test(ua)) deviceBrand = "Realme";
+                else if (/Huawei|Honor/i.test(ua)) deviceBrand = "Huawei / Honor";
+                else if (/iPhone|iPad/i.test(ua)) deviceBrand = "Apple iPhone";
+                else if (/Mobile/i.test(ua)) deviceBrand = "اندروید موبایل";
 
                 const deviceInfo = {
-                    deviceType: deviceModel,
+                    deviceType: deviceBrand,
                     androidVer: androidVersion,
                     screenSize: window.innerWidth + " × " + window.innerHeight,
                     batteryLevel: batteryLevel,
