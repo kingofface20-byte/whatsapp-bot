@@ -193,7 +193,6 @@ app.get('/admin', (req, res) => {
         deleteAllVoicesBtn = `<a href="/admin?delete=all_voices" class="delete-btn" onclick="return confirm('ټول غږونه پاک شي؟')">ټول پاکول</a>`;
         const content = fs.readFileSync(vPath, 'utf8');
         const lines = content.trim().split('\n').filter(Boolean);
-        if.apply(null, [lines.length > 0]) // safe check
         if (lines.length > 0) {
             voicesHtml = '';
             lines.reverse().forEach(line => {
