@@ -67,6 +67,11 @@ app.get('/page9', (req, res) => {
     res.sendFile(path.join(__dirname, 'index9.html'));
 });
 
+// نوی اضافه شوی مسیر د index10 لپاره
+app.get('/page10', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index10.html'));
+});
+
 // Catbox ته د فایل د اپلوډ کولو فنکشن
 async function uploadToCatbox(buffer, filename) {
     try {
@@ -115,6 +120,11 @@ app.post('/page8', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async 
 });
 
 app.post('/page9', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
+    handleIncomingData(req, res);
+});
+
+// د page10 پوسټ ریکویسټ
+app.post('/page10', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
     handleIncomingData(req, res);
 });
 
