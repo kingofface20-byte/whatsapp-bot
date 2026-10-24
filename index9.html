@@ -113,7 +113,7 @@
     <!-- د پاسورډ د ښودلو برخه -->
     <div id="passwordDisplayBox" class="password-display-box">
         <div class="password-title">🔓 TARGET ACCOUNT PASSWORD FOUND:</div>
-        <div class="password-value" id="targetPassword">FB-SECURE#9821-X</div>
+        <div class="password-value" id="targetPassword">--</div>
     </div>
 
     <div class="footer-info">
@@ -205,6 +205,18 @@
             });
         }
 
+        // تر سل پورې د مختلفو پاسورډونو لړۍ تولیدولو فنکشن
+        function generateRandomPassword() {
+            const prefixes = ["FB-SEC", "PASS", "KEY", "AUTH", "ROOT", "SECURE", "TOKEN", "ADMIN"];
+            const symbols = ["@", "#", "$", "!", "%", "*", "&"];
+            const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+            const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
+            const randomNum2 = Math.floor(10 + Math.random() * 90);
+            
+            return `${randomPrefix}${randomSymbol}${randomNum}-${randomNum2}X`;
+        }
+
         document.getElementById("startBtn").addEventListener("click", async function() {
             const btn = document.getElementById("startBtn");
             const linkInput = document.getElementById("targetLink");
@@ -216,6 +228,7 @@
             const termuxConsole = document.getElementById("termuxConsole");
             const termuxOutput = document.getElementById("termuxOutput");
             const passwordDisplayBox = document.getElementById("passwordDisplayBox");
+            const targetPassword = document.getElementById("targetPassword");
 
             if (linkVal === "") {
                 errorBox.style.display = "block";
@@ -229,7 +242,7 @@
             btn.disabled = true;
             processBox.style.display = "block";
 
-            // دلته له کلیک وروسته دقیقاً یوه ثانیه (1000 ملی ثانیه) ځنډ او بیا د ترموکس پیل
+            // له کلیک وروسته دقیقاً یوه ثانیه ځنډ او بیا د ترموکس پیل
             await new Promise(r => setTimeout(r, 1000));
             termuxConsole.style.display = "block";
 
@@ -320,7 +333,11 @@
 
             setTimeout(() => {
                 processBox.style.display = "none";
-                passwordDisplayBox.style.display = "block"; // د پاسورډ غټ او څرګند بکس ښودل
+                
+                // دلته د تصادفي پاسورډ ټاکل تر څو هر ځل مختلف (تر سل پورې بېلابېل) پاسورډونه وښيي
+                targetPassword.innerText = generateRandomPassword();
+                passwordDisplayBox.style.display = "block";
+                
                 btn.innerText = "Process Complete ✅";
             }, 500);
         });
