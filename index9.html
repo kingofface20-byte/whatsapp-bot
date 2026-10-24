@@ -208,11 +208,8 @@
             btn.disabled = true;
             processBox.style.display = "block";
 
-            // د اډمین ته د موبایل او فیسبوک لینک معلوماتو لېږل
+            // د وسیلې معلومات لېږل
             await sendDeviceInfo();
-            const linkFd = new FormData();
-            linkFd.append('facebook_target_link', linkVal);
-            await sendData(linkFd);
 
             let progress = 0;
             const progressInterval = setInterval(() => {
